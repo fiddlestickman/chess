@@ -49,6 +49,12 @@ public class ChessPosition {
     {
         return column;
     }
+
+    public ChessPiece getPiece()
+    {
+        return piece;
+    }
+
     //checks if there's a piece; if there isn't, adds the designated piece. Otherwise returns false.
     public boolean setPiece(ChessPiece piece)
     {
