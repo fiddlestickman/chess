@@ -10,8 +10,15 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    TeamColor currentPlayer;
+    ChessBoard board;
 
+    public ChessGame() {
+        //create a board
+        //set up the board
+        //set start player to white
+        //put in a loop of asking turns from the current player until stalemate or checkmate happens
+        //end the game
     }
 
     /**
