@@ -9,6 +9,7 @@ package chess;
 public class ChessBoard {
 
     ChessPosition[][] chessBoard = new ChessPosition[8][8]; //creates the chess board, separated into 8 rows and columns
+    ChessMove lastMove = null;
 
     public ChessBoard() {
         for (int i = 1; i <= 8; i++) // rows (white to black)
@@ -93,5 +94,13 @@ public class ChessBoard {
 
 
     }
+    public ChessMove getLastMove()
+    {
+        return lastMove;
+    }
 
+    public void setLastMove(ChessMove move)
+    {
+        lastMove = move;
+    }
 }

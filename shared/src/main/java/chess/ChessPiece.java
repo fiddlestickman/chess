@@ -57,8 +57,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition)
     {
-        int row = myPosition.getRow();
-        int column = myPosition.getColumn();
         ChessPiece piece = myPosition.getPiece();
         java.util.ArrayList<ChessMove> legalMoves = new java.util.ArrayList<ChessMove>(0);
 
@@ -75,7 +73,6 @@ public class ChessPiece {
             throw new RuntimeException("somehow the board and position given don't match");
         }
 
-        //make code for en passant
         if (piece.getPieceType() == PieceType.PAWN)
         {
             legalMoves.addAll(pawnMoves(myPosition, board));//adds all the legal pawn moves to the legal moves
@@ -86,32 +83,19 @@ public class ChessPiece {
         }
         else if (piece.getPieceType() == PieceType.BISHOP)
         {
-            //returns +n/+n, +n/-n, -n/+n, -n/-n, plus the current square
-            //make sure that there's no friendly pieces in the way (cannot go to or beyond that square)
-            //make sure there's no enemy pieces in the way (cannot go beyond that square)
-            //make sure it's not out of bounds
+            legalMoves.addAll(bishopMoves(myPosition, board));
         }
         else if (piece.getPieceType() == PieceType.ROOK)
         {
-            //returns +n/+0, -n/+0, +0/+n, +0/-n, plus current square
-            //make sure there's no friendly pieces in the way (cannot go to or beyond that square
-            //make sure there's no enemy pieces in the way (cannot go beyond that square)
-            //make sure it's not out of bounds
+            legalMoves.addAll(rookMoves(myPosition, board));
         }
         else if (piece.getPieceType() == PieceType.QUEEN)
         {
-            //combination of rook and bishop moves, just copy the code from both
+            legalMoves.addAll(queenMoves(myPosition, board));
         }
         else if (piece.getPieceType() == PieceType.KING)
         {
-            //returns +1/0/-1 row, +1/0/-1 column around the position
-            //check if there are friendly pieces in the way
-            //check if there are any enemy pieces that could attack that square (oof)
-                //could run the same equation for each enemy piece when selecting the king (recursion though)
-                //make a special piecemoves for the enemy king that avoids recursion
-                    //make special piecemoves that accounts for the new king position (moving one step further from bishop isn't safe)
-
-            //make sure it's not out of bounds
+            legalMoves.addAll(kingMoves(myPosition, board));
         }
         else
             return null; //no chess piece on that square
@@ -174,10 +158,26 @@ public class ChessPiece {
                     legalMoves.add(move); //adds the double move to the legal moves list
 
             }
-            if (row == 5)
+            if (row == 5)//en passant possible if pawn is on fifth rank
             {
-                //en passant
-                //needs the board to keep track of the last move played
+                ChessMove lastMove = board.getLastMove();
+                if (lastMove.getStartPosition().getRow() == 7
+                && lastMove.getEndPosition().getRow() == 5
+                && lastMove.getStartPosition().getPiece().getPieceType() == PieceType.PAWN) //makes sure that the last move was a double pawn move
+                {
+                    if(myPosition.getColumn() == lastMove.getEndPosition().getColumn()+1) //if the pawn moved to the right of the pawn
+                    {
+                        ChessPosition temp = new ChessPosition(row + 1, column + 1); //selects the position in front of pawn to the right
+                        ChessMove move = new ChessMove(myPosition, temp, promo); //sets up the capture move
+                        legalMoves.add(move); //adds the move to the list
+                    }
+                    if(myPosition.getColumn() == lastMove.getEndPosition().getColumn()-1) //if the pawn moved to the left of the pawn
+                    {
+                        ChessPosition temp = new ChessPosition(row + 1, column - 1); //selects the position in front of pawn to the left
+                        ChessMove move = new ChessMove(myPosition, temp, promo); //sets up the capture move
+                        legalMoves.add(move); //adds the move to the list
+                    }
+                }
             }
 
         }
@@ -227,10 +227,26 @@ public class ChessPiece {
                     legalMoves.add(move); //adds the double move to the legal moves list
 
             }
-            if (row == 4)
+            if (row == 4)//en passant possible if pawn is on fourth rank
             {
-                //en passant
-                //needs the board to keep track of the last move played
+                ChessMove lastMove = board.getLastMove();
+                if (lastMove.getStartPosition().getRow() == 2
+                        && lastMove.getEndPosition().getRow() == 4
+                        && lastMove.getStartPosition().getPiece().getPieceType() == PieceType.PAWN) //makes sure that the last move was a double pawn move
+                {
+                    if(myPosition.getColumn() == lastMove.getEndPosition().getColumn()+1) //if the pawn moved to the right of the pawn
+                    {
+                        ChessPosition temp = new ChessPosition(row - 1, column + 1); //selects the position in front of pawn to the right
+                        ChessMove move = new ChessMove(myPosition, temp, promo); //sets up the capture move
+                        legalMoves.add(move); //adds the move to the list
+                    }
+                    if(myPosition.getColumn() == lastMove.getEndPosition().getColumn()-1) //if the pawn moved to the left of the pawn
+                    {
+                        ChessPosition temp = new ChessPosition(row - 1, column - 1); //selects the position in front of pawn to the left
+                        ChessMove move = new ChessMove(myPosition, temp, promo); //sets up the capture move
+                        legalMoves.add(move); //adds the move to the list
+                    }
+                }
             }
 
         }
@@ -300,6 +316,37 @@ public class ChessPiece {
 
     private Collection<ChessMove> bishopMoves(ChessPosition myPosition, ChessBoard board)
     {
+        return dMoves(myPosition, board); //bishops only move diagonally
+    }
+
+    private Collection<ChessMove> rookMoves(ChessPosition myPosition, ChessBoard board)
+    {
+        return cMoves(myPosition, board); //rooks only move cardinally
+    }
+
+    private Collection<ChessMove> queenMoves(ChessPosition myPosition, ChessBoard board)
+    {
+        java.util.ArrayList<ChessMove> legalMoves = new java.util.ArrayList<ChessMove>(0);
+        legalMoves.addAll(cMoves(myPosition, board)); //queens move cardinally like rooks
+        legalMoves.addAll(dMoves(myPosition, board)); //and diagonally
+        return legalMoves;
+    }
+    private Collection<ChessMove> kingMoves(ChessPosition myPosition, ChessBoard board)
+    {
+        //returns +1/0/-1 row, +1/0/-1 column around the position
+        //check if there are friendly pieces in the way
+        //check if there are any enemy pieces that could attack that square (oof)
+        //could run the same equation for each enemy piece when selecting the king (recursion though)
+        //make a special piecemoves for the enemy king that avoids recursion
+        //make special piecemoves that accounts for the new king position (moving one step further from bishop isn't safe)
+
+        //make sure it's not out of bounds
+        return null;
+    }
+
+    //diagonal moves (i.e. bishop and queen)
+    private Collection<ChessMove> dMoves(ChessPosition myPosition, ChessBoard board)
+    {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         ChessPiece piece = myPosition.getPiece();
@@ -310,7 +357,7 @@ public class ChessPiece {
         while (legal) //iterates through moves until no longer legal
         {
             distance++;//increments the distance from the bishop
-            if (row+distance > 9 || column+distance > 9) //makes sure the move isn't out of bounds
+            if (row+distance >= 9 || column+distance >= 9) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -333,7 +380,7 @@ public class ChessPiece {
         while (legal) //iterates through moves until no longer legal
         {
             distance++;//increments the distance from the bishop
-            if (row-distance < 0 || column+distance > 9) //makes sure the move isn't out of bounds
+            if (row-distance <= 0 || column+distance >= 9) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -356,7 +403,7 @@ public class ChessPiece {
         while (legal) //iterates through moves until no longer legal
         {
             distance++;//increments the distance from the bishop
-            if (row-distance < 0 || column-distance < 0) //makes sure the move isn't out of bounds
+            if (row-distance <= 0 || column-distance <= 0) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -379,7 +426,7 @@ public class ChessPiece {
         while (legal) //iterates through moves until no longer legal
         {
             distance++;//increments the distance from the bishop
-            if (row+distance > 9 || column-distance < 0) //makes sure the move isn't out of bounds
+            if (row+distance >= 9 || column-distance <= 0) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -401,33 +448,106 @@ public class ChessPiece {
 
     }
 
-    private Collection<ChessMove> rookMoves(ChessPosition myPosition, ChessBoard board)
+    //cardinal moves (i.e. rook and queen)
+    private Collection<ChessMove> cMoves(ChessPosition myPosition, ChessBoard board)
     {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         ChessPiece piece = myPosition.getPiece();
         java.util.ArrayList<ChessMove> legalMoves = new java.util.ArrayList<ChessMove>(0);
 
-
         boolean legal = true;
-        int distance = 0;
+        int distance = 0; //distance away from rook
         while (legal) //iterates through moves until no longer legal
         {
+            distance++;//increments the distance from the rook
+            if (row+distance >= 9) //makes sure the move isn't out of bounds
+            {
+                legal = false;
+            }
+            else {
+                ChessPosition temp = new ChessPosition(row + distance, column); //selects the next spot northeast of bishop
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
+                ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
+                if (test.getPieceType() == null) //checks that there's no piece in the way
+                    legalMoves.add(move);
+                else if (test.getTeamColor() != piece.getTeamColor()) {
+                    legalMoves.add(move); //lets you capture the piece
+                    legal = false; //further moves are illegal
+                } else
+                    legal = false;
+            }
+        }
 
+        legal = true;
+        distance = 0; //distance away from rook
+        while (legal) //iterates through moves until no longer legal
+        {
+            distance++;//increments the distance from the rook
+            if (column+distance >= 9) //makes sure the move isn't out of bounds
+            {
+                legal = false;
+            }
+            else {
+                ChessPosition temp = new ChessPosition(row, column+distance); //selects the next spot northeast of bishop
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
+                ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
+                if (test.getPieceType() == null) //checks that there's no piece in the way
+                    legalMoves.add(move);
+                else if (test.getTeamColor() != piece.getTeamColor()) {
+                    legalMoves.add(move); //lets you capture the piece
+                    legal = false; //further moves are illegal
+                } else
+                    legal = false;
+            }
+        }
+
+        legal = true;
+        distance = 0; //distance away from rook
+        while (legal) //iterates through moves until no longer legal
+        {
+            distance++;//increments the distance from the rook
+            if (row-distance <= 0) //makes sure the move isn't out of bounds
+            {
+                legal = false;
+            }
+            else {
+                ChessPosition temp = new ChessPosition(row-distance, column); //selects the next spot northeast of bishop
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
+                ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
+                if (test.getPieceType() == null) //checks that there's no piece in the way
+                    legalMoves.add(move);
+                else if (test.getTeamColor() != piece.getTeamColor()) {
+                    legalMoves.add(move); //lets you capture the piece
+                    legal = false; //further moves are illegal
+                } else
+                    legal = false;
+            }
+        }
+
+        legal = true;
+        distance = 0; //distance away from rook
+        while (legal) //iterates through moves until no longer legal
+        {
+            distance++;//increments the distance from the rook
+            if (row-column <= 0) //makes sure the move isn't out of bounds
+            {
+                legal = false;
+            }
+            else {
+                ChessPosition temp = new ChessPosition(row, column-distance); //selects the next spot northeast of bishop
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
+                ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
+                if (test.getPieceType() == null) //checks that there's no piece in the way
+                    legalMoves.add(move);
+                else if (test.getTeamColor() != piece.getTeamColor()) {
+                    legalMoves.add(move); //lets you capture the piece
+                    legal = false; //further moves are illegal
+                } else
+                    legal = false;
+            }
         }
         return legalMoves;
-    }
-
-    //diagonal moves (i.e. bishop and queen)
-    private Collection<ChessMove> dMoves(ChessPosition myPosition, ChessBoard board)
-    {
-        return null;
-    }
-
-    //horizontal moves (i.e. rook and queen)
-    private Collection<ChessMove> hMoves(ChessPosition myPosition, ChessBoard board)
-    {
-        return null;
     }
 
 
