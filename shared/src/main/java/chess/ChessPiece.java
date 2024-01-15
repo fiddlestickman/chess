@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -333,15 +334,87 @@ public class ChessPiece {
     }
     private Collection<ChessMove> kingMoves(ChessPosition myPosition, ChessBoard board)
     {
-        //returns +1/0/-1 row, +1/0/-1 column around the position
-        //check if there are friendly pieces in the way
-        //check if there are any enemy pieces that could attack that square (oof)
-        //could run the same equation for each enemy piece when selecting the king (recursion though)
-        //make a special piecemoves for the enemy king that avoids recursion
-        //make special piecemoves that accounts for the new king position (moving one step further from bishop isn't safe)
+        java.util.ArrayList<ChessMove> legalMoves = new java.util.ArrayList<ChessMove>(0);
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        ChessGame.TeamColor attacker;
+        if (myPosition.getPiece().getTeamColor() == ChessGame.TeamColor.WHITE)
+            attacker = ChessGame.TeamColor.BLACK;
+        else if (myPosition.getPiece().getTeamColor() == ChessGame.TeamColor.BLACK)
+            attacker = ChessGame.TeamColor.WHITE;
+        else
+            throw new RuntimeException("there's no king here, what's going on?");
 
-        //make sure it's not out of bounds
-        return null;
+        boolean northFine = true;
+        boolean eastFine = true;
+        boolean southFine = true;
+        boolean westFine = true;
+        if (myPosition.getRow() == 8) //checks if the square attacked is at the top of the board or not
+            northFine = false;
+        if (myPosition.getColumn() == 8) //checks if the square attacked is on the right side of the board or not
+            eastFine = false;
+        if (myPosition.getRow() == 1) //checks if the square attacked is at the bottom of the board or not
+            southFine = false;
+        if (myPosition.getColumn() == 1) //checks if the square attacked is on the left side of the board or not
+            westFine = false;
+
+        ChessPosition checkedPosition = new ChessPosition(row+1, col);
+        if (northFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row+1, col+1);
+        if (northFine && eastFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row, col+1);
+        if (eastFine && !board.squareAttacked(attacker, checkedPosition) &&
+            checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row-1, col+1);
+        if (eastFine && southFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row-1, col);
+        if (southFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row-1, col-1);
+        if (southFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row, col-1);
+        if (westFine && !board.squareAttacked(attacker, checkedPosition) &&
+                checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        checkedPosition = new ChessPosition(row+1, col-1);
+        if (westFine && northFine && !board.squareAttacked(attacker, checkedPosition) &&
+            checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
+        {
+            ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
+            legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
+        }
+        return legalMoves;
     }
 
     //diagonal moves (i.e. bishop and queen)
