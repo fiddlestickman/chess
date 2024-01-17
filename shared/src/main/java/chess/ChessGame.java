@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -26,7 +27,7 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn()
     {
-        throw new RuntimeException("Not implemented");
+        return currentPlayer;
     }
 
     /**
@@ -34,8 +35,9 @@ public class ChessGame {
      *
      * @param team the team whose turn it is
      */
-    public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+    public void setTeamTurn(TeamColor team)
+    {
+        currentPlayer = team;
     }
 
     /**
@@ -53,8 +55,9 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+    public Collection<ChessMove> validMoves(ChessPosition startPosition)
+    {
+        return board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
     /**
@@ -73,8 +76,33 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheck(TeamColor teamColor)
+    {
+        //finds the friendly king
+        ChessPosition kingPosition = null;
+        for (int i = 1; i <= 8; i++) // rows (white to black)
+        {
+            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
+            {
+                //if the chess piece on the square is the friendly king
+                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
+                    kingPosition = new ChessPosition(i, j);
+            }
+        }
+        if (kingPosition == null)
+            throw new RuntimeException("there's no king here, what?");
+
+        TeamColor attacker = null;
+        if (teamColor == TeamColor.WHITE)
+            attacker = TeamColor.BLACK;
+        else if (teamColor == TeamColor.BLACK)
+            attacker = TeamColor.WHITE;
+
+        if (attacker == null)
+            throw new RuntimeException("somehow the team color is neither white nor black");
+
+        //returns whether the king's square is under attack
+        return board.squareAttacked(attacker, kingPosition);
     }
 
     /**
@@ -83,8 +111,14 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheckmate(TeamColor teamColor)
+    {
+        if (isInCheck(teamColor))
+        {
+
+        }
+        else
+            return false;
     }
 
     /**
@@ -94,7 +128,8 @@ public class ChessGame {
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
      */
-    public boolean isInStalemate(TeamColor teamColor) {
+    public boolean isInStalemate(TeamColor teamColor)
+    {
         throw new RuntimeException("Not implemented");
     }
 
@@ -104,7 +139,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -113,6 +148,32 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
+    }
+
+    private boolean wayOutOfCheckmate(TeamColor teamColor)
+    {
+        //finds the friendly king
+        ChessPosition kingPosition = null;
+        for (int i = 1; i <= 8; i++) // rows (white to black)
+        {
+            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
+            {
+                //if the chess piece on the square is the friendly king
+                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
+                    kingPosition = new ChessPosition(i, j);
+            }
+        }
+        if (kingPosition == null)
+            throw new RuntimeException("there's no king here, what?");
+
+        //checks if the king has any legal moves - if it does, not checkmate
+        if (board.getPiece(kingPosition).pieceMoves(board, kingPosition).isEmpty())
+        {
+
+        }
+        else
+            return false;
+
     }
 }

@@ -20,14 +20,6 @@ public class ChessMove {
         promo = promotionPiece;
     }
 
-    //creates a dummy ChessMove to make arrays and collections
-    public ChessMove()
-    {
-        start=null;
-        end=null;
-        promo=null;
-    }
-
     /**
      * @return ChessPosition of starting location
      */

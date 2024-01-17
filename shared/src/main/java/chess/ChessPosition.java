@@ -24,14 +24,6 @@ public class ChessPosition {
         piece=null;
     }
 
-    //creates a dummy, out of bounds chess position in order to initialize chessboard arrays.
-    public ChessPosition()
-    {
-        row=0;
-        column=0;
-        piece=null;
-    }
-
     /**
      * @return which row this position is in
      * 1 codes for the bottom row

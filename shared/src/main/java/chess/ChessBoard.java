@@ -102,10 +102,12 @@ public class ChessBoard {
     }
 
     //checks if a square is under attack (useful for legal king moves)
-    public boolean squareAttacked (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
+    public String squareAttacked (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
     {
+
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
+        StringBuilder attackerSquare = new StringBuilder();
 
         if (chessBoard[row][col].getPiece() != attackedSquare.getPiece())
         {
@@ -118,12 +120,15 @@ public class ChessBoard {
             ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
             if (row > 1 && col > 1) { //makes sure the pawn checked for is within bounds
                 if (Objects.equals(chessBoard[row - 1][col - 1].getPiece(), pieceTested)) {
-                    return true;
+                    attackerSquare.append(row-1);
+                    attackerSquare.append(col-1);
                 }
             }
             if (row > 1 && col < 8) { // makes sure the pawn checked for is within bounds
                 if (Objects.equals(chessBoard[row - 1][col + 1].getPiece(), pieceTested)) {
-                    return true;
+
+                    attackerSquare.append(row-1);
+                    attackerSquare.append(col+1);
                 }
             }
         }
@@ -133,49 +138,42 @@ public class ChessBoard {
             //checks if there's a white pawn attacking the square
             ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
             if (row < 8 && col > 1) { //makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row - 1][col - 1].getPiece(), pieceTested)) {
-                    return true;
+                if (Objects.equals(chessBoard[row + 1][col - 1].getPiece(), pieceTested)) {
+                    attackerSquare.append(row+1);
+                    attackerSquare.append(col-1);
                 }
             }
             if (row < 8 && col < 8) { // makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row - 1][col + 1].getPiece(), pieceTested)) {
-                    return true;
+                if (Objects.equals(chessBoard[row + 1][col + 1].getPiece(), pieceTested)) {
+                    attackerSquare.append(row+1);
+                    attackerSquare.append(col+1);
                 }
             }
         }
-        if (dAttacker(attacker, attackedSquare)) //checks if there's a bishop or queen attacking from a diagonal
-            return true;
-        if (cAttacker(attacker, attackedSquare)) //checks if there's a rook or queen attacking from a rank or file
-            return true;
+        attackerSquare.append(dAttacker(attacker, attackedSquare)); //checks if there's a bishop or queen attacking from a diagonal
+        attackerSquare.append(cAttacker(attacker, attackedSquare)); //checks if there's a rook or queen attacking from a rank or file
+
         //checks if there's a knight that can attack from any l-shape spot
-        if (kAttacker(attacker, row+2, col+1))
-            return true;
-        if (kAttacker(attacker, row+1, col+2))
-            return true;
-        if (kAttacker(attacker, row-1, col+2))
-            return true;
-        if (kAttacker(attacker, row-2, col+1))
-            return true;
-        if (kAttacker(attacker, row-2, col-1))
-            return true;
-        if (kAttacker(attacker, row-1, col-2))
-            return true;
-        if (kAttacker(attacker, row+1, col-2))
-            return true;
-        if (kAttacker(attacker, row+2, col-1))
-            return true;
+        attackerSquare.append(kAttacker(attacker, row+2, col+1));
+        attackerSquare.append(kAttacker(attacker, row+1, col+2));
+        attackerSquare.append(kAttacker(attacker, row-1, col+2));
+        attackerSquare.append(kAttacker(attacker, row-2, col+1));
+        attackerSquare.append(kAttacker(attacker, row-2, col-1));
+        attackerSquare.append(kAttacker(attacker, row-1, col-2));
+        attackerSquare.append(kAttacker(attacker, row+1, col-2));
+        attackerSquare.append(kAttacker(attacker, row+2, col-1));
 
-        if (kingAttacker(attacker, attackedSquare))
-            return true;
+        attackerSquare.append(kingAttacker(attacker, attackedSquare));
 
-        return false;
+        return attackerSquare.toString();
 
     }
 
-    private boolean dAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
+    private String dAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
     {
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
+        StringBuilder attackerSquare = new StringBuilder();
 
         //checks if there's a bishop or queen attacking the square
         chess.ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.BISHOP);
@@ -193,7 +191,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row+distance][col+distance].getPiece(); //gets the piece on the square targeted
                 //if the piece on the square is an enemy bishop or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row+distance);
+                    attackerSquare.append(col+distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -212,7 +212,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row-distance][col+distance].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy bishop or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row-distance);
+                    attackerSquare.append(col+distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -231,7 +233,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row-distance][col-distance].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy bishop or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row-distance);
+                    attackerSquare.append(col-distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -250,17 +254,20 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row+distance][col-distance].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy bishop or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row+distance);
+                    attackerSquare.append(col-distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
-        return false;
+        return attackerSquare.toString();
     }
 
-    private boolean cAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare) {
+    private String cAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare) {
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
+        StringBuilder attackerSquare = new StringBuilder();
 
         //checks if there's a rook or queen attacking the square
         chess.ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.ROOK);
@@ -277,7 +284,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row + distance][col].getPiece(); //gets the piece on the square targeted
                 //if the piece on the square is an enemy rook or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row+distance);
+                    attackerSquare.append(col);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -296,7 +305,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row][col+distance].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy rook or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row);
+                    attackerSquare.append(col+distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -315,7 +326,9 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row-distance][col].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy rook or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row-distance);
+                    attackerSquare.append(col);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
@@ -333,33 +346,41 @@ public class ChessBoard {
                 ChessPiece test = chessBoard[row][col-distance].getPiece(); //gets the piece on the next square
                 //if the piece on the square is an enemy rook or queen
                 if (Objects.equals(test, pieceTested) || Objects.equals(test, pieceTested2)) {
-                    return true;
+                    attackerSquare.append(row);
+                    attackerSquare.append(col-distance);
+                    legal = false;
                 } else if (test.getPieceType() != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
-        return false;
+        return attackerSquare.toString();
     }
 
-    private boolean kAttacker (ChessGame.TeamColor attacker, int finalRow, int finalCol) //works for knights
+    private String kAttacker (ChessGame.TeamColor attacker, int finalRow, int finalCol) //works for knights
     {
         if (finalRow < 9 && finalCol < 9 && finalRow > 0 && finalCol > 0) //makes sure the move is not out of bounds
         {
             ChessPiece test = chessBoard[finalRow][finalCol].getPiece(); //gets the piece on the square targeted
-            if (test.getPieceType() == ChessPiece.PieceType.KNIGHT && test.getTeamColor() == attacker) //checks if there's a knight on the attacking square
-                return true;
+            if (test.getPieceType() == ChessPiece.PieceType.KNIGHT && test.getTeamColor() == attacker)
+            {
+                //checks if there's a knight on the attacking square
+                return String.valueOf(finalRow) + finalCol;
+
+            }
             else
-                return false;
+                return "";
         }
         else
-            return false; //no knight can attack from out of bounds
+            return ""; //no knight can attack from out of bounds
     }
 
-    private boolean kingAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare) //works for kings
+    private String kingAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare) //works for kings
     {
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
         chess.ChessPiece testPiece = new chess.ChessPiece(attacker, ChessPiece.PieceType.KING);
+
+        StringBuilder attackerSquare = new StringBuilder();
 
         boolean northFine = true;
         boolean eastFine = true;
@@ -374,24 +395,57 @@ public class ChessBoard {
         if (attackedSquare.getColumn() == 1) //checks if the square attacked is on the left side of the board or not
             westFine = false;
 
-        if (northFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks top square for king
-            return true;
-        if (northFine && eastFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks top right for king
-            return true;
-        if (eastFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks right square for king
-            return true;
-        if (eastFine && southFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks bottom right for king
-            return true;
-        if (southFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks bottom square for king
-            return true;
-        if (southFine && westFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks bottom left for king
-            return true;
-        if (westFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks left square for king
-            return true;
-        if (westFine && northFine && Objects.equals(chessBoard[row + 1][col].getPiece(), testPiece)) //checks top left for king
-            return true;
+        if (northFine && Objects.equals(chessBoard[row+1][col].getPiece(), testPiece))
+        {
+            //checks top square for king
+            attackerSquare.append(row+1);
+            attackerSquare.append(col);
+            return attackerSquare.toString();
+        }
+        if (northFine && eastFine && Objects.equals(chessBoard[row+1][col+1].getPiece(), testPiece)) //checks top right for king
+        {
+            attackerSquare.append(row+1);
+            attackerSquare.append(col+1);
+            return attackerSquare.toString();
+        }
+        if (eastFine && Objects.equals(chessBoard[row][col+1].getPiece(), testPiece)) //checks right square for king
+        {
+            attackerSquare.append(row);
+            attackerSquare.append(col+1);
+            return attackerSquare.toString();
+        }
+        if (eastFine && southFine && Objects.equals(chessBoard[row-1][col+1].getPiece(), testPiece)) //checks bottom right for king
+        {
+            attackerSquare.append(row-1);
+            attackerSquare.append(col+1);
+            return attackerSquare.toString();
+        }
+        if (southFine && Objects.equals(chessBoard[row-1][col].getPiece(), testPiece)) //checks bottom square for king
+        {
+            attackerSquare.append(row-1);
+            attackerSquare.append(col);
+            return attackerSquare.toString();
+        }
+        if (southFine && westFine && Objects.equals(chessBoard[row-1][col-1].getPiece(), testPiece)) //checks bottom left for king
+        {
+            attackerSquare.append(row-1);
+            attackerSquare.append(col-1);
+            return attackerSquare.toString();
+        }
+        if (westFine && Objects.equals(chessBoard[row][col-1].getPiece(), testPiece)) //checks left square for king
+        {
+            attackerSquare.append(row);
+            attackerSquare.append(col-1);
+            return attackerSquare.toString();
+        }
+        if (westFine && northFine && Objects.equals(chessBoard[row+1][col-1].getPiece(), testPiece)) //checks top left for king
+        {
+            attackerSquare.append(row+1);
+            attackerSquare.append(col-1);
+            return attackerSquare.toString();
+        }
         else
-            return false;
+            return "";
 
     }
 

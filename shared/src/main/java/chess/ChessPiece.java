@@ -359,56 +359,56 @@ public class ChessPiece {
             westFine = false;
 
         ChessPosition checkedPosition = new ChessPosition(row+1, col);
-        if (northFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (northFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row+1, col+1);
-        if (northFine && eastFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (northFine && eastFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row, col+1);
-        if (eastFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (eastFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
             checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row-1, col+1);
-        if (eastFine && southFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (eastFine && southFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row-1, col);
-        if (southFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (southFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row-1, col-1);
-        if (southFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (southFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row, col-1);
-        if (westFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (westFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
                 checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
             legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
         }
         checkedPosition = new ChessPosition(row+1, col-1);
-        if (westFine && northFine && !board.squareAttacked(attacker, checkedPosition) &&
+        if (westFine && northFine && Objects.equals(board.squareAttacked(attacker, checkedPosition), "") &&
             checkedPosition.getPiece().getTeamColor() !=myPosition.getPiece().getTeamColor()) //checks top square for attackers and friendly pieces
         {
             ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
