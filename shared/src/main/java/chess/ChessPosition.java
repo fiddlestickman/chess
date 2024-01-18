@@ -14,14 +14,14 @@ public class ChessPosition {
 
     public ChessPosition(int row, int col)
     {
-        if(0 >= row || row >= 9)
+        if(1 > row || row > 8)
             throw new RuntimeException("Row out of bounds");
-        if(0 >= col || col >= 9)
+        if(1 > col || col > 8)
             throw new RuntimeException("Column out of bounds");
 
         this.row=row;
         this.column=col;
-        piece=null;
+        piece = new ChessPiece(chess.ChessGame.TeamColor.NOTHING, chess.ChessPiece.PieceType.NOTHING);
     }
 
     /**
@@ -50,7 +50,7 @@ public class ChessPosition {
     //checks if there's a piece; if there isn't, adds the designated piece. Otherwise returns false.
     public boolean setPiece(ChessPiece piece)
     {
-        if (this.piece == null ) {
+        if (this.piece.getPieceType() == ChessPiece.PieceType.NOTHING) {
             this.piece = piece;
             return true;
         }
@@ -60,10 +60,10 @@ public class ChessPosition {
     //checks if there's a piece; if there is, removes the piece. Otherwise returns false.
     public boolean removePiece()
     {
-        if (this.piece == null)
+        if (this.piece.getPieceType() == ChessPiece.PieceType.NOTHING)
             return false;
         else {
-            piece = null;
+            piece = new ChessPiece(ChessGame.TeamColor.NOTHING, ChessPiece.PieceType.NOTHING);
             return true;
         }
     }

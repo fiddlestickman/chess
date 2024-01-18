@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    ChessPosition[][] chessBoard = new ChessPosition[8][8]; //creates the chess board, separated into 8 rows and columns
+    ChessPosition[][] chessBoard = new ChessPosition[9][9]; //creates the chess board, separated into 8 rows and columns (with a ghostly zeroeth rank and file)
     ChessMove lastMove = null;
 
     public ChessBoard() {
@@ -46,6 +46,7 @@ public class ChessBoard {
         int row = position.getRow();
         int column = position.getColumn();
         return chessBoard[row][column].getPiece();
+
     }
 
     /**
@@ -118,13 +119,13 @@ public class ChessBoard {
         {
             //checks if there's a white pawn attacking the square
             ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
-            if (row > 1 && col > 1) { //makes sure the pawn checked for is within bounds
+            if (row > 0 && col > 0) { //makes sure the pawn checked for is within bounds
                 if (Objects.equals(chessBoard[row - 1][col - 1].getPiece(), pieceTested)) {
                     attackerSquare.append(row-1);
                     attackerSquare.append(col-1);
                 }
             }
-            if (row > 1 && col < 8) { // makes sure the pawn checked for is within bounds
+            if (row > 0 && col < 7) { // makes sure the pawn checked for is within bounds
                 if (Objects.equals(chessBoard[row - 1][col + 1].getPiece(), pieceTested)) {
 
                     attackerSquare.append(row-1);
@@ -135,7 +136,7 @@ public class ChessBoard {
 
         else if (attacker == ChessGame.TeamColor.BLACK)
         {
-            //checks if there's a white pawn attacking the square
+            //checks if there's a black pawn attacking the square
             ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
             if (row < 8 && col > 1) { //makes sure the pawn checked for is within bounds
                 if (Objects.equals(chessBoard[row + 1][col - 1].getPiece(), pieceTested)) {
@@ -194,7 +195,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -215,7 +216,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -236,7 +237,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -257,7 +258,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -287,7 +288,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -308,7 +309,7 @@ public class ChessBoard {
                     attackerSquare.append(row);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -329,7 +330,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -349,7 +350,7 @@ public class ChessBoard {
                     attackerSquare.append(row);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != null)
+                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }

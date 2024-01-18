@@ -17,7 +17,10 @@ public class ChessMove {
     {
         start = startPosition;
         end = endPosition;
-        promo = promotionPiece;
+        if (promotionPiece != null)
+            promo = promotionPiece;
+        else
+            promo = ChessPiece.PieceType.NOTHING;
     }
 
     /**
