@@ -109,11 +109,7 @@ public class ChessBoard {
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
         StringBuilder attackerSquare = new StringBuilder();
-
-        if (chessBoard[row][col].getPiece() != attackedSquare.getPiece())
-        {
-            throw new RuntimeException("the piece given doesn't match the board state (weird)");
-        }
+        ChessPiece piece = chessBoard[row][col].getPiece();
 
         if (attacker == ChessGame.TeamColor.WHITE)
         {
@@ -226,7 +222,7 @@ public class ChessBoard {
         while (legal) //iterates through squares away from checked square
         {
             distance++;//increments the distance from the square
-            if (row-distance <= 0 || col+distance <= 0) //makes sure the move isn't out of bounds
+            if (row-distance <= 0 || col-distance <= 0) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -247,7 +243,7 @@ public class ChessBoard {
         while (legal) //iterates through squares away from checked square
         {
             distance++;//increments the distance from the square
-            if (row+distance >= 9 || col+distance <= 0) //makes sure the move isn't out of bounds
+            if (row+distance >= 9 || col-distance <= 0) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
@@ -339,7 +335,7 @@ public class ChessBoard {
         while (legal) //iterates through squares away from checked square
         {
             distance++;//increments the distance from the square
-            if (col+distance <= 0) //makes sure the move isn't out of bounds
+            if (col-distance <= 0) //makes sure the move isn't out of bounds
             {
                 legal = false;
             }
