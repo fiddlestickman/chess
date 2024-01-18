@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,15 +11,23 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    TeamColor currentPlayer;
+    ChessBoard board;
 
+    public ChessGame() {
+        //create a board
+        //set up the board
+        //set start player to white
+        //put in a loop of asking turns from the current player until stalemate or checkmate happens
+        //end the game
     }
 
     /**
      * @return Which team's turn it is
      */
-    public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+    public TeamColor getTeamTurn()
+    {
+        return currentPlayer;
     }
 
     /**
@@ -26,8 +35,9 @@ public class ChessGame {
      *
      * @param team the team whose turn it is
      */
-    public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+    public void setTeamTurn(TeamColor team)
+    {
+        currentPlayer = team;
     }
 
     /**
@@ -35,7 +45,8 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK,
+        NOTHING
     }
 
     /**
@@ -45,8 +56,9 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+    public Collection<ChessMove> validMoves(ChessPosition startPosition)
+    {
+        return board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
     /**
@@ -65,8 +77,36 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheck(TeamColor teamColor)
+    {
+        //finds the friendly king
+        ChessPosition kingPosition = null;
+        for (int i = 1; i <= 8; i++) // rows (white to black)
+        {
+            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
+            {
+                //if the chess piece on the square is the friendly king
+                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
+                    kingPosition = new ChessPosition(i, j);
+            }
+        }
+        if (kingPosition == null)
+            throw new RuntimeException("there's no king here, what?");
+
+        TeamColor attacker = null;
+        if (teamColor == TeamColor.WHITE)
+            attacker = TeamColor.BLACK;
+        else if (teamColor == TeamColor.BLACK)
+            attacker = TeamColor.WHITE;
+
+        if (attacker == null)
+            throw new RuntimeException("somehow the team color is neither white nor black");
+
+        //returns whether the king's square is under attack
+        if (Objects.equals(board.squareAttacked(attacker, kingPosition), ""))
+            return true;
+        else
+            return false;
     }
 
     /**
@@ -75,8 +115,81 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheckmate(TeamColor teamColor)
+    {
+        //finds the friendly king
+        ChessPosition kingPosition = null;
+        for (int i = 1; i <= 8; i++) // rows (white to black)
+        {
+            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
+            {
+                //if the chess piece on the square is the friendly king
+                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
+                    kingPosition = new ChessPosition(i, j);
+            }
+        }
+        if (kingPosition == null)
+            throw new RuntimeException("there's no king here, what?");
+
+        TeamColor attacker = null;
+        if (teamColor == TeamColor.WHITE)
+            attacker = TeamColor.BLACK;
+        else if (teamColor == TeamColor.BLACK)
+            attacker = TeamColor.WHITE;
+
+        if (attacker == null)
+            throw new RuntimeException("somehow the team color is neither white nor black");
+
+        String attackers = board.squareAttacked(attacker, kingPosition);
+
+        //returns whether the king's square is under attack
+        if (Objects.equals(attackers, ""))
+            return false; //king is not under attack, not checkmate
+        else
+        {
+            //king is in check, may be checkmate
+            if (kingPosition.getPiece().pieceMoves(board, kingPosition) == null)
+            {
+                //king has no moves
+                if (board.squareAttacked(attacker, kingPosition).length() > 2)
+                    return true; //double attack + no king moves = checkmate
+                else
+                {
+                    //check if there's any non-king piece that can stop checkmate
+                    int row = attackers.charAt(0);
+                    int col = attackers.charAt(1);//the row and column the attacking piece rests on
+
+                    //make code to see if piece is pinned
+                    //if piece is pinned, skip looking at their moves
+                    //check if you have any pieces that can capture the enemy piece first
+
+
+                    int row_diff = row-kingPosition.getRow();
+                    int col_diff = col-kingPosition.getColumn();//determines the relative position of king and attacker
+
+                    if(row_diff == 0) //rook or queen on same row
+                    {
+
+                    }
+                    else if(col_diff == 0) //rook or queen on same column
+                    {
+
+                    }
+
+                    else if (row_diff - col_diff == 0) //bishop or queen on up and right diagonal
+                    {
+
+                    }
+                    else if (row_diff + col_diff == 0) //bishop or queen on down and right diagonal
+                    {
+
+                    }
+                }
+            }
+            else
+                return false; //king can move, not checkmate
+        }
+        return false;
     }
 
     /**
@@ -86,7 +199,8 @@ public class ChessGame {
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
      */
-    public boolean isInStalemate(TeamColor teamColor) {
+    public boolean isInStalemate(TeamColor teamColor)
+    {
         throw new RuntimeException("Not implemented");
     }
 
@@ -96,7 +210,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +219,33 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
+    }
+
+    private boolean wayOutOfCheckmate(TeamColor teamColor)
+    {
+        //finds the friendly king
+        ChessPosition kingPosition = null;
+        for (int i = 1; i <= 8; i++) // rows (white to black)
+        {
+            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
+            {
+                //if the chess piece on the square is the friendly king
+                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
+                    kingPosition = new ChessPosition(i, j);
+            }
+        }
+        if (kingPosition == null)
+            throw new RuntimeException("there's no king here, what?");
+
+        //checks if the king has any legal moves - if it does, not checkmate
+        if (board.getPiece(kingPosition).pieceMoves(board, kingPosition).isEmpty())
+        {
+
+        }
+        else
+            return false;
+
+        return false;
     }
 }
