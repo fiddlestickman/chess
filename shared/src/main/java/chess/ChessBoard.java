@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -449,5 +450,24 @@ public class ChessBoard {
     public void setLastMove(ChessMove move)
     {
         lastMove = move;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(chessBoard, that.chessBoard) && Objects.equals(lastMove, that.lastMove);
+
+
+    }
+
+
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(lastMove);
+        result = 31 * result + Arrays.hashCode(chessBoard);
+        return result;
     }
 }
