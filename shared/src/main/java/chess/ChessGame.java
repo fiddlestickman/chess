@@ -93,11 +93,20 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), mypiece);
 
         //if the move causes the player to be in check, reverse the move (it's invalid)
-        if (this.isInCheck(currentPlayer))
+        /*if (this.isInCheck(currentPlayer))
         {
             board = temp;
             throw new InvalidMoveException();
         }
+
+         */
+
+        //switch teams
+        if (currentPlayer == TeamColor.WHITE)
+            currentPlayer = TeamColor.BLACK;
+        else if (currentPlayer == TeamColor.BLACK)
+            currentPlayer = TeamColor.WHITE;
+
     }
 
     /**
