@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -15,11 +16,15 @@ public class ChessGame {
     ChessBoard board;
 
     public ChessGame() {
-        //create a board
+        //make the board
+        board = new ChessBoard();
+
         //set up the board
+        board.resetBoard();
+
         //set start player to white
-        //put in a loop of asking turns from the current player until stalemate or checkmate happens
-        //end the game
+        currentPlayer = TeamColor.WHITE;
+
     }
 
     /**
@@ -68,7 +73,31 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        //get the starting piece
+        ChessPiece mypiece = board.getPiece(move.getStartPosition());
+
+        //if no starting piece or piece is the wrong color, it's an invalid move
+        if (mypiece.getTeamColor() != currentPlayer)
+            throw new InvalidMoveException();
+
+        //make sure that the move being made can be made by that piece
+        java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if (!moves.contains(move))
+            throw new InvalidMoveException();
+
+        //copy the current board
+        ChessBoard temp = board;
+
+        //make the move
+        board.removePiece(move.getStartPosition());
+        board.addPiece(move.getEndPosition(), mypiece);
+
+        //if the move causes the player to be in check, reverse the move (it's invalid)
+        if (this.isInCheck(currentPlayer))
+        {
+            board = temp;
+            throw new InvalidMoveException();
+        }
     }
 
     /**

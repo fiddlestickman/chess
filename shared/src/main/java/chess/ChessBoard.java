@@ -103,6 +103,14 @@ public class ChessBoard {
         return lastMove;
     }
 
+    public void removePiece(ChessPosition position)
+    {
+        int row = position.getRow();
+        int col = position.getColumn();
+
+        chessBoard[row][col].removePiece();
+    }
+
     //checks if a square is under attack (useful for legal king moves)
     public String squareAttacked (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
     {
@@ -458,11 +466,7 @@ public class ChessBoard {
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(chessBoard, that.chessBoard) && Objects.equals(lastMove, that.lastMove);
-
-
     }
-
-
 
     @Override
     public int hashCode() {

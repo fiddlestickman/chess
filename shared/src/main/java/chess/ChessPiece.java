@@ -70,7 +70,7 @@ public class ChessPiece {
         //makes sure the position given and the board state match
         // they both have a potentially different piece assigned to the same square
         if (board.getPiece(myPosition).getPieceType() != piece.getPieceType()
-        || board.getPiece(myPosition).getTeamColor() != piece.getTeamColor())
+                || board.getPiece(myPosition).getTeamColor() != piece.getTeamColor())
         {
             throw new RuntimeException("somehow the board and position given don't match");
         }
