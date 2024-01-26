@@ -75,11 +75,11 @@ public class ChessPosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPosition that = (ChessPosition) o;
-        return row == that.row && column == that.column && Objects.equals(piece, that.piece);
+        return row == that.row && column == that.column;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, column, piece);
+        return Objects.hash(row, column);
     }
 }

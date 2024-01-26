@@ -14,6 +14,8 @@ public class ChessGame {
 
     TeamColor currentPlayer;
     ChessBoard board;
+    ChessMove lastMove;
+    ChessPiece lastMoveCaptured;
 
     public ChessGame() {
         //make the board
@@ -76,30 +78,35 @@ public class ChessGame {
         //get the starting piece
         ChessPiece mypiece = board.getPiece(move.getStartPosition());
 
-        //if no starting piece or piece is the wrong color, it's an invalid move
-        if (mypiece.getTeamColor() != currentPlayer)
-            throw new InvalidMoveException();
+            //if no starting piece or piece is the wrong color, it's an invalid move
+            if (mypiece.getTeamColor() != currentPlayer)
+                throw new InvalidMoveException();
 
         //make sure that the move being made can be made by that piece
-        java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if (!moves.contains(move))
-            throw new InvalidMoveException();
-
-        //copy the current board
-        ChessBoard temp = board;
+            java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
+            if (!moves.contains(move))
+                throw new InvalidMoveException();
+        //copy the piece potentially captured
+        ChessPiece slainpiece = board.getPiece(move.getEndPosition());
 
         //make the move
         board.removePiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), mypiece);
+        //normal move
+        if (move.getPromotionPiece() != ChessPiece.PieceType.NOTHING || move.getPromotionPiece() != null)
+            board.addPiece(move.getEndPosition(), mypiece);
+        //pawn promotion move
+        else
+            board.addPiece(move.getEndPosition(), new ChessPiece(mypiece.getTeamColor(), move.getPromotionPiece()));
 
         //if the move causes the player to be in check, reverse the move (it's invalid)
-        /*if (this.isInCheck(currentPlayer))
+        if (this.isInCheck(currentPlayer))
         {
-            board = temp;
-            throw new InvalidMoveException();
+            board.removePiece(move.getEndPosition());
+            board.addPiece(move.getStartPosition(), mypiece);
+            board.addPiece(move.getEndPosition(), slainpiece);
+            throw new InvalidMoveException("is still in check");
         }
 
-         */
 
         //switch teams
         if (currentPlayer == TeamColor.WHITE)
@@ -118,6 +125,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor)
     {
         //finds the friendly king
+        //only works if there's one king
         ChessPosition kingPosition = null;
         for (int i = 1; i <= 8; i++) // rows (white to black)
         {
@@ -129,7 +137,7 @@ public class ChessGame {
             }
         }
         if (kingPosition == null)
-            throw new RuntimeException("there's no king here, what?");
+            return false;
 
         TeamColor attacker = null;
         if (teamColor == TeamColor.WHITE)
@@ -141,10 +149,10 @@ public class ChessGame {
             throw new RuntimeException("somehow the team color is neither white nor black");
 
         //returns whether the king's square is under attack
-        if (Objects.equals(board.squareAttacked(attacker, kingPosition), ""))
-            return true;
-        else
+        if (board.squareAttacked(attacker, kingPosition).isEmpty())
             return false;
+        else
+            return true;
     }
 
     /**
@@ -155,79 +163,10 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor)
     {
-        //finds the friendly king
-        ChessPosition kingPosition = null;
-        for (int i = 1; i <= 8; i++) // rows (white to black)
-        {
-            for (int j = 1; j <= 8; j++) //columns (queenside to kingside)
-            {
-                //if the chess piece on the square is the friendly king
-                if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
-                    kingPosition = new ChessPosition(i, j);
-            }
-        }
-        if (kingPosition == null)
-            throw new RuntimeException("there's no king here, what?");
-
-        TeamColor attacker = null;
-        if (teamColor == TeamColor.WHITE)
-            attacker = TeamColor.BLACK;
-        else if (teamColor == TeamColor.BLACK)
-            attacker = TeamColor.WHITE;
-
-        if (attacker == null)
-            throw new RuntimeException("somehow the team color is neither white nor black");
-
-        String attackers = board.squareAttacked(attacker, kingPosition);
-
-        //returns whether the king's square is under attack
-        if (Objects.equals(attackers, ""))
-            return false; //king is not under attack, not checkmate
-        else
-        {
-            //king is in check, may be checkmate
-            if (kingPosition.getPiece().pieceMoves(board, kingPosition) == null)
-            {
-                //king has no moves
-                if (board.squareAttacked(attacker, kingPosition).length() > 2)
-                    return true; //double attack + no king moves = checkmate
-                else
-                {
-                    //check if there's any non-king piece that can stop checkmate
-                    int row = attackers.charAt(0);
-                    int col = attackers.charAt(1);//the row and column the attacking piece rests on
-
-                    //make code to see if piece is pinned
-                    //if piece is pinned, skip looking at their moves
-                    //check if you have any pieces that can capture the enemy piece first
-
-
-                    int row_diff = row-kingPosition.getRow();
-                    int col_diff = col-kingPosition.getColumn();//determines the relative position of king and attacker
-
-                    if(row_diff == 0) //rook or queen on same row
-                    {
-
-                    }
-                    else if(col_diff == 0) //rook or queen on same column
-                    {
-
-                    }
-
-                    else if (row_diff - col_diff == 0) //bishop or queen on up and right diagonal
-                    {
-
-                    }
-                    else if (row_diff + col_diff == 0) //bishop or queen on down and right diagonal
-                    {
-
-                    }
-                }
-            }
-            else
-                return false; //king can move, not checkmate
-        }
-        return false;
+        //can't be checkmate if there's no check
+        if (!this.isInCheck(teamColor))
+            return false;
+        else return noLegalMoves(teamColor);
     }
 
     /**
@@ -239,7 +178,10 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor)
     {
-        throw new RuntimeException("Not implemented");
+        //can't be stalemate if king is in check
+        if (this.isInCheck(teamColor))
+            return false;
+        else return noLegalMoves(teamColor);
     }
 
     /**
@@ -260,7 +202,7 @@ public class ChessGame {
         return board;
     }
 
-    private boolean wayOutOfCheckmate(TeamColor teamColor)
+    private boolean noLegalMoves(TeamColor teamColor)
     {
         //finds the friendly king
         ChessPosition kingPosition = null;
@@ -276,14 +218,86 @@ public class ChessGame {
         if (kingPosition == null)
             throw new RuntimeException("there's no king here, what?");
 
-        //checks if the king has any legal moves - if it does, not checkmate
-        if (board.getPiece(kingPosition).pieceMoves(board, kingPosition).isEmpty())
-        {
+        //there is a king and it's under attack, may be checkmate
 
+        //check if the king can move
+        Collection<ChessMove> kingMoves = kingPosition.getPiece().pieceMoves(board, kingPosition);
+        java.util.Iterator<ChessMove> kingiterator = kingMoves.iterator();
+        boolean escapesquare = false;
+        while (kingiterator.hasNext())
+        {
+            ChessMove next = kingiterator.next();
+
+            //make the move
+            ChessPiece mypiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+            ChessPiece slainpiece = board.getPiece(next.getEndPosition());
+            board.removePiece(next.getStartPosition());
+            board.addPiece(next.getEndPosition(), mypiece);
+
+            //if it's not check anymore, it's an escape square
+            if (!isInCheck(teamColor))
+                escapesquare = true;
+
+            //reverse the move
+            board.removePiece(next.getEndPosition());
+            board.addPiece(next.getStartPosition(), mypiece);
+            board.addPiece(next.getEndPosition(), slainpiece);
         }
-        else
+        //there's a way out, not checkmate
+        if (escapesquare)
             return false;
 
-        return false;
+        //there's no move for the white king, check if there's any other piece that can move
+        for (int i = 1; i <=8; i++)
+        {
+            for (int j = 1; j <=8; j++)
+            {
+                ChessPiece test = board.getPiece(new ChessPosition(i,j));
+                //look for pieces that are white but aren't the king
+                if (test.getTeamColor() == teamColor && test.getPieceType() != ChessPiece.PieceType.KING)
+                {
+                    Collection<ChessMove> pieceMoves = test.pieceMoves(board, new ChessPosition(i,j));
+                    java.util.Iterator<ChessMove> pieceiterator = pieceMoves.iterator();
+                    boolean blocksquare = false;
+                    //check their moves to see if they can block checkmate
+                    while (pieceiterator.hasNext())
+                    {
+                        ChessMove next = pieceiterator.next();
+
+                        //make the move
+                        ChessPiece slainpiece = board.getPiece(next.getEndPosition());
+                        board.removePiece(next.getStartPosition());
+                        board.addPiece(next.getEndPosition(), test);
+
+                        //if it's not check anymore, there's a square that can block
+                        if (!isInCheck(teamColor))
+                            blocksquare = true;
+
+                        //reverse the move
+                        board.removePiece(next.getEndPosition());
+                        board.addPiece(next.getStartPosition(), test);
+                        board.addPiece(next.getEndPosition(), slainpiece);
+                    }
+                    if (blocksquare)
+                        return false;
+                }
+            }
+        }
+        //there's no escape move for the king, and no piece can legally move
+        //it's checkmate or stalemate
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return currentPlayer == chessGame.currentPlayer && Objects.equals(board, chessGame.board) && Objects.equals(lastMove, chessGame.lastMove) && Objects.equals(lastMoveCaptured, chessGame.lastMoveCaptured);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentPlayer, board, lastMove, lastMoveCaptured);
     }
 }

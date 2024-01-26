@@ -123,13 +123,13 @@ public class ChessPiece {
                 //checks if front of pawn is legal
 
                 ChessPosition temp = new ChessPosition(row+1, column); //selects the position in front of pawn
-                promo = chess.ChessPiece.PieceType.QUEEN;
+                promo = chess.ChessPiece.PieceType.BISHOP;
                 ChessMove move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                promo = chess.ChessPiece.PieceType.ROOK;
+                promo = chess.ChessPiece.PieceType.QUEEN;
                 ChessMove move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 promo = chess.ChessPiece.PieceType.KNIGHT;
                 ChessMove move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                promo = chess.ChessPiece.PieceType.BISHOP;
+                promo = chess.ChessPiece.PieceType.ROOK;
                 ChessMove move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
                 if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
@@ -143,13 +143,13 @@ public class ChessPiece {
                 //checks if left front of pawn is legal
                 if (column > 1) {
                     temp = new ChessPosition(row + 1, column - 1); //selects the position in front of pawn to the left
-                    promo = chess.ChessPiece.PieceType.QUEEN;
+                    promo = chess.ChessPiece.PieceType.BISHOP;
                     move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.ROOK;
+                    promo = chess.ChessPiece.PieceType.QUEEN;
                     move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     promo = chess.ChessPiece.PieceType.KNIGHT;
                     move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.BISHOP;
+                    promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
                     if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
@@ -165,13 +165,13 @@ public class ChessPiece {
                 //checks if right front of pawn is legal
                 if (column < 8) {
                     temp = new ChessPosition(row + 1, column + 1); //selects the position in front of pawn to the right
-                    promo = chess.ChessPiece.PieceType.QUEEN;
+                    promo = chess.ChessPiece.PieceType.BISHOP;
                     move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.ROOK;
+                    promo = chess.ChessPiece.PieceType.QUEEN;
                     move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     promo = chess.ChessPiece.PieceType.KNIGHT;
                     move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.BISHOP;
+                    promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
                     if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
@@ -250,13 +250,13 @@ public class ChessPiece {
             {
                 //checks if front of pawn is legal
                 ChessPosition temp = new ChessPosition(row-1, column); //selects the position in front of pawn
-                promo = chess.ChessPiece.PieceType.QUEEN;
+                promo = chess.ChessPiece.PieceType.BISHOP;
                 ChessMove move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                promo = chess.ChessPiece.PieceType.ROOK;
+                promo = chess.ChessPiece.PieceType.QUEEN;
                 ChessMove move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 promo = chess.ChessPiece.PieceType.KNIGHT;
                 ChessMove move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                promo = chess.ChessPiece.PieceType.BISHOP;
+                promo = chess.ChessPiece.PieceType.ROOK;
                 ChessMove move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
                 if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
@@ -270,13 +270,13 @@ public class ChessPiece {
                 //checks if left front of pawn is legal
                 if (column > 1) {
                     temp = new ChessPosition(row - 1, column - 1); //selects the position in front of pawn to the left
-                    promo = chess.ChessPiece.PieceType.QUEEN;
+                    promo = chess.ChessPiece.PieceType.BISHOP;
                     move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.ROOK;
+                    promo = chess.ChessPiece.PieceType.QUEEN;
                     move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     promo = chess.ChessPiece.PieceType.KNIGHT;
                     move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.BISHOP;
+                    promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
                     if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
@@ -293,11 +293,11 @@ public class ChessPiece {
                     temp = new ChessPosition(row - 1, column + 1); //selects the position in front of pawn to the right
                     promo = chess.ChessPiece.PieceType.QUEEN;
                     move1 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.ROOK;
-                    move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
-                    promo = chess.ChessPiece.PieceType.KNIGHT;
-                    move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     promo = chess.ChessPiece.PieceType.BISHOP;
+                    move2 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
+                    promo = chess.ChessPiece.PieceType.ROOK;
+                    move3 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
+                    promo = chess.ChessPiece.PieceType.KNIGHT;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
                     if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
@@ -913,5 +913,4 @@ public class ChessPiece {
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
-
 }

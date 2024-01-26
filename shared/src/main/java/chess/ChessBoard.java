@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -12,7 +14,6 @@ import java.util.Objects;
 public class ChessBoard {
 
     ChessPosition[][] chessBoard = new ChessPosition[9][9]; //creates the chess board, separated into 8 rows and columns (with a ghostly zeroeth rank and file)
-    ChessMove lastMove = null;
 
     public ChessBoard() {
         for (int i = 1; i <= 8; i++) // rows (white to black)
@@ -33,6 +34,7 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         int row = position.getRow();
         int column = position.getColumn();
+        chessBoard[row][column].removePiece();
         chessBoard[row][column].setPiece(piece); //sets the piece on the chess position indicated.
     }
 
@@ -98,10 +100,6 @@ public class ChessBoard {
 
 
     }
-    public ChessMove getLastMove()
-    {
-        return lastMove;
-    }
 
     public void removePiece(ChessPosition position)
     {
@@ -112,67 +110,33 @@ public class ChessBoard {
     }
 
     //checks if a square is under attack (useful for legal king moves)
-    public String squareAttacked (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
+    public Collection<ChessMove> squareAttacked (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
     {
 
         int row = attackedSquare.getRow();
         int col = attackedSquare.getColumn();
-        StringBuilder attackerSquare = new StringBuilder();
-        ChessPiece piece = chessBoard[row][col].getPiece();
+        java.util.Collection<ChessMove> attackmoves = new java.util.ArrayList<>();
 
-        if (attacker == ChessGame.TeamColor.WHITE)
-        {
-            //checks if there's a white pawn attacking the square
-            ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
-            if (row > 0 && col > 0) { //makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row - 1][col - 1].getPiece(), pieceTested)) {
-                    attackerSquare.append(row-1);
-                    attackerSquare.append(col-1);
-                }
-            }
-            if (row > 0 && col < 7) { // makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row - 1][col + 1].getPiece(), pieceTested)) {
+        //finds all the enemy pieces on the board
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece temp = chessBoard[i][j].getPiece();
+                if (temp.getTeamColor() == attacker)  //gets their potential moves
+                {
+                    java.util.Collection<ChessMove> tempmoves = temp.pieceMoves(this, new ChessPosition(i, j));
+                    java.util.Iterator<ChessMove> temparray = tempmoves.iterator();
 
-                    attackerSquare.append(row-1);
-                    attackerSquare.append(col+1);
-                }
-            }
-        }
-
-        else if (attacker == ChessGame.TeamColor.BLACK)
-        {
-            //checks if there's a black pawn attacking the square
-            ChessPiece pieceTested = new ChessPiece(attacker, chess.ChessPiece.PieceType.PAWN);
-            if (row < 8 && col > 1) { //makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row + 1][col - 1].getPiece(), pieceTested)) {
-                    attackerSquare.append(row+1);
-                    attackerSquare.append(col-1);
-                }
-            }
-            if (row < 8 && col < 8) { // makes sure the pawn checked for is within bounds
-                if (Objects.equals(chessBoard[row + 1][col + 1].getPiece(), pieceTested)) {
-                    attackerSquare.append(row+1);
-                    attackerSquare.append(col+1);
+                    for (int k = 0; k < tempmoves.size(); k++) //checks the moves for moves that attack the square given
+                    {
+                        ChessMove next = temparray.next();
+                        if (next.getEndPosition().getRow() == attackedSquare.getRow()
+                                && next.getEndPosition().getColumn() == attackedSquare.getColumn())
+                            attackmoves.add(next); //adds the move if it attacks the square
+                    }
                 }
             }
         }
-        attackerSquare.append(dAttacker(attacker, attackedSquare)); //checks if there's a bishop or queen attacking from a diagonal
-        attackerSquare.append(cAttacker(attacker, attackedSquare)); //checks if there's a rook or queen attacking from a rank or file
-
-        //checks if there's a knight that can attack from any l-shape spot
-        attackerSquare.append(kAttacker(attacker, row+2, col+1));
-        attackerSquare.append(kAttacker(attacker, row+1, col+2));
-        attackerSquare.append(kAttacker(attacker, row-1, col+2));
-        attackerSquare.append(kAttacker(attacker, row-2, col+1));
-        attackerSquare.append(kAttacker(attacker, row-2, col-1));
-        attackerSquare.append(kAttacker(attacker, row-1, col-2));
-        attackerSquare.append(kAttacker(attacker, row+1, col-2));
-        attackerSquare.append(kAttacker(attacker, row+2, col-1));
-
-        attackerSquare.append(kingAttacker(attacker, attackedSquare));
-
-        return attackerSquare.toString();
-
+        return attackmoves;
     }
 
     private String dAttacker (ChessGame.TeamColor attacker, ChessPosition attackedSquare)
@@ -455,23 +419,17 @@ public class ChessBoard {
 
     }
 
-    public void setLastMove(ChessMove move)
-    {
-        lastMove = move;
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(chessBoard, that.chessBoard) && Objects.equals(lastMove, that.lastMove);
+        return Arrays.deepEquals(chessBoard, that.chessBoard);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(lastMove);
-        result = 31 * result + Arrays.hashCode(chessBoard);
-        return result;
+        return Arrays.deepHashCode(chessBoard);
     }
 }
