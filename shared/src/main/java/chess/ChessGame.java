@@ -65,7 +65,33 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition)
     {
-        return board.getPiece(startPosition).pieceMoves(board, startPosition);
+        //finds the piece on the board being tested
+        ChessPiece piece = board.getPiece(startPosition);
+        //get the possible moves that piece can make and set up possible legal moves
+        Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
+
+        java.util.Iterator<ChessMove> pieceiterator = pieceMoves.iterator();
+        //check their moves to see if they are free to move to whichever square
+        while (pieceiterator.hasNext())
+        {
+            ChessMove next = pieceiterator.next();
+
+            //make the move
+            ChessPiece slainpiece = board.getPiece(next.getEndPosition());
+            board.removePiece(next.getStartPosition());
+            board.addPiece(next.getEndPosition(), piece);
+
+            //if the king is not in check, it's a legal move
+            if (!isInCheck(piece.getTeamColor()))
+                legalMoves.add(next);
+
+            //reverse the move
+            board.removePiece(next.getEndPosition());
+            board.addPiece(next.getStartPosition(), piece);
+            board.addPiece(next.getEndPosition(), slainpiece);
+        }
+        return legalMoves;
     }
 
     /**
