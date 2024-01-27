@@ -103,25 +103,31 @@ public class ChessGame {
         //get the starting piece
         ChessPiece mypiece = board.getPiece(move.getStartPosition());
 
-            //if no starting piece or piece is the wrong color, it's an invalid move
-            if (mypiece.getTeamColor() != currentPlayer)
-                throw new InvalidMoveException();
+        //if no starting piece or piece is the wrong color, it's an invalid move
+        if (mypiece == null)
+            throw new InvalidMoveException();
+
+        if (mypiece.getTeamColor() != currentPlayer)
+            throw new InvalidMoveException();
+
 
         //make sure that the move being made can be made by that piece
-            java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
-            if (!moves.contains(move))
-                throw new InvalidMoveException();
+        java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if (!moves.contains(move))
+            throw new InvalidMoveException();
         //copy the piece potentially captured
         ChessPiece slainpiece = board.getPiece(move.getEndPosition());
 
         //make the move
         board.removePiece(move.getStartPosition());
-        //normal move
-        if (move.getPromotionPiece() != null)
-            board.addPiece(move.getEndPosition(), mypiece);
         //pawn promotion move
+        if (move.getPromotionPiece() != null) {
+            ChessPiece promo = new ChessPiece(mypiece.getTeamColor(), move.getPromotionPiece());
+            board.addPiece(move.getEndPosition(), promo);
+        }
+        //normal move
         else
-            board.addPiece(move.getEndPosition(), new ChessPiece(mypiece.getTeamColor(), move.getPromotionPiece()));
+            board.addPiece(move.getEndPosition(), mypiece);
 
         //if the move causes the player to be in check, reverse the move (it's invalid)
         if (this.isInCheck(currentPlayer))
@@ -246,7 +252,8 @@ public class ChessGame {
         //there is a king and it's under attack, may be checkmate
 
         //check if the king can move
-        Collection<ChessMove> kingMoves = kingPosition.getPiece().pieceMoves(board, kingPosition);
+        ChessPiece temp = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+        Collection<ChessMove> kingMoves = temp.pieceMoves(board, kingPosition);
         java.util.Iterator<ChessMove> kingiterator = kingMoves.iterator();
         boolean escapesquare = false;
         while (kingiterator.hasNext())
@@ -279,7 +286,7 @@ public class ChessGame {
             {
                 ChessPiece test = board.getPiece(new ChessPosition(i,j));
                 //look for pieces that are white but aren't the king
-                if (test.getTeamColor() == teamColor && test.getPieceType() != ChessPiece.PieceType.KING)
+                if (test != null && test.getTeamColor() == teamColor && test.getPieceType() != ChessPiece.PieceType.KING)
                 {
                     Collection<ChessMove> pieceMoves = test.pieceMoves(board, new ChessPosition(i,j));
                     java.util.Iterator<ChessMove> pieceiterator = pieceMoves.iterator();
