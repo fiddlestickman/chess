@@ -22,7 +22,7 @@ public class ChessMove {
         if (promotionPiece != null)
             promo = promotionPiece;
         else
-            promo = ChessPiece.PieceType.NOTHING;
+            promo = null;
     }
 
     /**

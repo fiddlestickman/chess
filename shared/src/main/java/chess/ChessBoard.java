@@ -121,7 +121,7 @@ public class ChessBoard {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPiece temp = chessBoard[i][j].getPiece();
-                if (temp.getTeamColor() == attacker)  //gets their potential moves
+                if (temp != null && temp.getTeamColor() == attacker)  //gets their potential moves
                 {
                     java.util.Collection<ChessMove> tempmoves = temp.pieceMoves(this, new ChessPosition(i, j));
                     java.util.Iterator<ChessMove> temparray = tempmoves.iterator();
@@ -164,7 +164,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -185,7 +185,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -206,7 +206,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -227,7 +227,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -257,7 +257,7 @@ public class ChessBoard {
                     attackerSquare.append(row+distance);
                     attackerSquare.append(col);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -278,7 +278,7 @@ public class ChessBoard {
                     attackerSquare.append(row);
                     attackerSquare.append(col+distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -299,7 +299,7 @@ public class ChessBoard {
                     attackerSquare.append(row-distance);
                     attackerSquare.append(col);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }
@@ -319,7 +319,7 @@ public class ChessBoard {
                     attackerSquare.append(row);
                     attackerSquare.append(col-distance);
                     legal = false;
-                } else if (test.getPieceType() != ChessPiece.PieceType.NOTHING)
+                } else if (test != null)
                     legal = false; //the piece on that square can't attack the square, and blocks more distant attackers
             }
         }

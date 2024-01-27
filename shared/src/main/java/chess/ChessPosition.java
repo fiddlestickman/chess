@@ -23,7 +23,7 @@ public class ChessPosition {
 
         this.row=row;
         this.column=col;
-        piece = new ChessPiece(chess.ChessGame.TeamColor.NOTHING, chess.ChessPiece.PieceType.NOTHING);
+        piece = null;
     }
 
     /**
@@ -52,7 +52,7 @@ public class ChessPosition {
     //checks if there's a piece; if there isn't, adds the designated piece. Otherwise returns false.
     public boolean setPiece(ChessPiece piece)
     {
-        if (this.piece.getPieceType() == ChessPiece.PieceType.NOTHING) {
+        if (this.piece == null) {
             this.piece = piece;
             return true;
         }
@@ -62,10 +62,10 @@ public class ChessPosition {
     //checks if there's a piece; if there is, removes the piece. Otherwise returns false.
     public boolean removePiece()
     {
-        if (this.piece.getPieceType() == ChessPiece.PieceType.NOTHING)
+        if (this.piece == null)
             return false;
         else {
-            piece = new ChessPiece(ChessGame.TeamColor.NOTHING, ChessPiece.PieceType.NOTHING);
+            piece = null;
             return true;
         }
     }

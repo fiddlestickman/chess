@@ -52,8 +52,7 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK,
-        NOTHING
+        BLACK
     }
 
     /**
@@ -118,7 +117,7 @@ public class ChessGame {
         //make the move
         board.removePiece(move.getStartPosition());
         //normal move
-        if (move.getPromotionPiece() != ChessPiece.PieceType.NOTHING || move.getPromotionPiece() != null)
+        if (move.getPromotionPiece() != null)
             board.addPiece(move.getEndPosition(), mypiece);
         //pawn promotion move
         else

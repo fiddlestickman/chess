@@ -30,8 +30,7 @@ public class ChessPiece {
         BISHOP,
         KNIGHT,
         ROOK,
-        PAWN,
-        NOTHING
+        PAWN
     }
 
     /**
@@ -59,13 +58,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition)
     {
-        ChessPiece piece = board.getPiece(myPosition);
         java.util.ArrayList<ChessMove> legalMoves = new java.util.ArrayList<ChessMove>(0);
-
-        if (piece.getPieceType() == PieceType.NOTHING)
+        if (board.getPiece(myPosition) == null)
         {
             return legalMoves; //no piece on the square selected
         }
+        ChessPiece piece = board.getPiece(myPosition);
 
         //makes sure the position given and the board state match
         // they both have a potentially different piece assigned to the same square
@@ -117,7 +115,7 @@ public class ChessPiece {
         //moves for white
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
         {
-            ChessPiece.PieceType promo = PieceType.NOTHING;
+            ChessPiece.PieceType promo = null;
             if (row == 7)
             {
                 //checks if front of pawn is legal
@@ -132,7 +130,7 @@ public class ChessPiece {
                 promo = chess.ChessPiece.PieceType.ROOK;
                 ChessMove move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                 {
                     legalMoves.add(move1); //adds the move going forward to the legal moves list
                     legalMoves.add(move2); //adds the move going forward to the legal moves list
@@ -152,7 +150,7 @@ public class ChessPiece {
                     promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
                     {
 
                         legalMoves.add(move1); //adds the move going forward to the legal moves list
@@ -174,7 +172,7 @@ public class ChessPiece {
                     promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
                     {
                         legalMoves.add(move1); //adds the move going forward to the legal moves list
                         legalMoves.add(move2); //adds the move going forward to the legal moves list
@@ -188,7 +186,7 @@ public class ChessPiece {
                 ChessPosition temp = new ChessPosition(row+1, column); //selects the position in front of pawn
                 ChessMove move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move); //adds the move going forward to the legal moves list
 
                 //checks if left front of pawn is legal
@@ -196,7 +194,7 @@ public class ChessPiece {
                     temp = new ChessPosition(row + 1, column - 1); //selects the position in front of pawn to the left
                     move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
                         legalMoves.add(move); //adds the capture move to the legal moves list
                 }
 
@@ -205,7 +203,7 @@ public class ChessPiece {
                     temp = new ChessPosition(row + 1, column + 1); //selects the position in front of pawn to the right
                     move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.BLACK) //checks that there's a capturable piece
                         legalMoves.add(move); //adds the capture move to the legal moves list
                 }
             }
@@ -217,7 +215,7 @@ public class ChessPiece {
                 ChessMove move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square two steps in front of pawn
                 ChessPiece test2 = board.getPiece(temp2); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING && test2.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null && test2 == null) //checks that there's no piece in the way
                     legalMoves.add(move); //adds the double move to the legal moves list
 
             }
@@ -245,7 +243,7 @@ public class ChessPiece {
         }
         else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK)
         {
-            chess.ChessPiece.PieceType promo = PieceType.NOTHING; //sets promo to null unless on seventh rank
+            chess.ChessPiece.PieceType promo = null; //sets promo to null unless on seventh rank
             if (row == 2)
             {
                 //checks if front of pawn is legal
@@ -259,7 +257,7 @@ public class ChessPiece {
                 promo = chess.ChessPiece.PieceType.ROOK;
                 ChessMove move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                 {
                     legalMoves.add(move1); //adds the move going forward to the legal moves list
                     legalMoves.add(move2); //adds the move going forward to the legal moves list
@@ -279,7 +277,7 @@ public class ChessPiece {
                     promo = chess.ChessPiece.PieceType.ROOK;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
                     {
                         legalMoves.add(move1); //adds the move going forward to the legal moves list
                         legalMoves.add(move2); //adds the move going forward to the legal moves list
@@ -300,7 +298,7 @@ public class ChessPiece {
                     promo = chess.ChessPiece.PieceType.KNIGHT;
                     move4 = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
                     {
                         legalMoves.add(move1); //adds the move going forward to the legal moves list
                         legalMoves.add(move2); //adds the move going forward to the legal moves list
@@ -315,7 +313,7 @@ public class ChessPiece {
                 ChessPosition temp = new ChessPosition(row-1, column); //selects the position in front of pawn
                 ChessMove move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move); //adds the move going forward to the legal moves list
 
                 //checks if left front of pawn is legal
@@ -323,7 +321,7 @@ public class ChessPiece {
                     temp = new ChessPosition(row - 1, column - 1); //selects the position in front of pawn to the left
                     move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
                         legalMoves.add(move); //adds the capture move to the legal moves list
                 }
 
@@ -332,7 +330,7 @@ public class ChessPiece {
                     temp = new ChessPosition(row - 1, column + 1); //selects the position in front of pawn to the right
                     move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                     test = board.getPiece(temp); //gets the piece on the square in front of pawn
-                    if (test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
+                    if (test != null && test.getTeamColor() == ChessGame.TeamColor.WHITE) //checks that there's a capturable piece
                         legalMoves.add(move); //adds the capture move to the legal moves list
                 }
             }
@@ -344,7 +342,7 @@ public class ChessPiece {
                 ChessMove move = new ChessMove(myPosition, temp, promo); //states that pawn is not promoting
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square two steps in front of pawn
                 ChessPiece test2 = board.getPiece(temp2); //gets the piece on the square in front of pawn
-                if (test.getPieceType() == PieceType.NOTHING && test2.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null && test2 == null) //checks that there's no piece in the way
                     legalMoves.add(move); //adds the double move to the legal moves list
 
             }
@@ -423,9 +421,11 @@ public class ChessPiece {
         {
             ChessPosition myPosition = new ChessPosition(startRow, startCol);//sets the start position
             ChessPosition temp = new ChessPosition(finalRow, finalCol); //selects the second clockwise position around knight
-            ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+            ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
             ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-            if (test.getPieceType() == PieceType.NOTHING || test.getTeamColor() != piece.getTeamColor() ) //checks that there's no friendly piece in the way
+            if (test == null) //checks that there's no piece in the way
+                return move;
+            else if (test.getTeamColor() != piece.getTeamColor()) //or that the piece there is an enemy
                 return move;
             else
                 return null;
@@ -474,65 +474,65 @@ public class ChessPiece {
         ChessPosition checkedPosition;
         if (northFine) {
             checkedPosition = new ChessPosition(row+1, col);
-            if (board.getPiece(checkedPosition).getTeamColor() != piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (northFine && eastFine) {
             checkedPosition = new ChessPosition(row+1, col+1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (eastFine) {
             checkedPosition = new ChessPosition(row, col+1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (eastFine && southFine) {
             checkedPosition = new ChessPosition(row-1, col+1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (southFine) {
             checkedPosition = new ChessPosition(row-1, col);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (southFine && westFine) {
             checkedPosition = new ChessPosition(row-1, col-1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (westFine) {
             checkedPosition = new ChessPosition(row, col-1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
         if (westFine && northFine) {
             checkedPosition = new ChessPosition(row+1, col-1);
-            if (board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() !=piece.getTeamColor())
             {
-                ChessMove newMove = new ChessMove(myPosition, checkedPosition, PieceType.NOTHING);
+                ChessMove newMove = new ChessMove(myPosition, checkedPosition, null);
                 legalMoves.add(newMove); //adds the move from the current square to the checked square as possible
             }
         }
@@ -558,9 +558,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row + distance, column + distance); //selects the next spot northeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -581,9 +581,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row - distance, column + distance); //selects the next spot southeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -604,9 +604,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row - distance, column - distance); //selects the next spot southwest of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -627,9 +627,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row + distance, column - distance); //selects the next spot northwest of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -662,9 +662,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row + distance, column); //selects the next spot northeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -685,9 +685,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row, column+distance); //selects the next spot northeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -708,9 +708,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row-distance, column); //selects the next spot northeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -731,9 +731,9 @@ public class ChessPiece {
             }
             else {
                 ChessPosition temp = new ChessPosition(row, column-distance); //selects the next spot northeast of bishop
-                ChessMove move = new ChessMove(myPosition, temp, PieceType.NOTHING); //sets up the move
+                ChessMove move = new ChessMove(myPosition, temp, null); //sets up the move
                 ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                if (test.getPieceType() == PieceType.NOTHING) //checks that there's no piece in the way
+                if (test == null) //checks that there's no piece in the way
                     legalMoves.add(move);
                 else if (test.getTeamColor() != piece.getTeamColor()) {
                     legalMoves.add(move); //lets you capture the piece
@@ -743,162 +743,6 @@ public class ChessPiece {
             }
         }
         return legalMoves;
-    }
-
-    public boolean isPinned(ChessPosition friendlyKing, ChessPosition myPosition, ChessBoard board)
-    {
-        int myRow = myPosition.getRow();
-        int myCol = myPosition.getColumn();
-        int kingRow = friendlyKing.getRow();
-        int kingCol = friendlyKing.getColumn();
-
-
-        boolean legal = true;
-        int distance = 0; //distance away from rook or bishop
-
-        if (myRow - kingRow == 0) //same row, check for pinning rook or queen
-        {
-            if (myCol > kingCol) //we are to the right of the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myCol+distance >= 9) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow, myCol+distance); //selects the next spot right of the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getTeamColor() == friendlyKing.getPiece().getTeamColor()) //it's friendly, no worries
-                            return true; //piece is pinned, not allowed to move
-                        if (test.getPieceType() == PieceType.ROOK || test.getPieceType() == PieceType.QUEEN) //there's a rook or queen that's pinning if it's an enemy
-                        {
-
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-            else if (myCol < kingCol) //we are to the left of the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myCol-distance <= 0) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow, myCol-distance); //selects the next spot left of the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getPieceType() == PieceType.ROOK || test.getPieceType() == PieceType.QUEEN) //there's a rook or queen that's pinning if it's an enemy
-                        {
-                            if (test.getTeamColor() != friendlyKing.getPiece().getTeamColor()) //oh snap it's an enemy
-                                return true; //piece is pinned, not allowed to move
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-        }
-        else if (myCol - kingCol == 0) //same column, check for pinning rook or queen
-        {
-            if (myRow > kingRow) //we are above the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myRow+distance >= 9) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow+distance, myCol); //selects the next spot above the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getPieceType() == PieceType.ROOK || test.getPieceType() == PieceType.QUEEN) //there's a rook or queen that's pinning if it's an enemy
-                        {
-                            if (test.getTeamColor() != friendlyKing.getPiece().getTeamColor()) //oh snap it's an enemy
-                                return true; //piece is pinned, not allowed to move
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-            else if (myRow < kingRow) //we are below the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myRow-distance <= 0) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow-distance, myCol); //selects the next spot below the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getPieceType() == PieceType.ROOK || test.getPieceType() == PieceType.QUEEN) //there's a rook or queen that's pinning if it's an enemy
-                        {
-                            if (test.getTeamColor() != friendlyKing.getPiece().getTeamColor()) //oh snap it's an enemy
-                                return true; //piece is pinned, not allowed to move
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-        }
-        else if (myRow - kingRow == myCol - kingCol) //same diagonal, check for bishop or queen
-        {
-            if (myRow > kingRow) //we are above and to the right of the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myRow+distance >= 9 || myCol+distance >= 9) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow+distance, myCol+distance); //selects the next spot above the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getPieceType() == PieceType.BISHOP || test.getPieceType() == PieceType.QUEEN) //there's a bishop or queen that's pinning if it's an enemy
-                        {
-                            if (test.getTeamColor() != friendlyKing.getPiece().getTeamColor()) //oh snap it's an enemy
-                                return true; //piece is pinned, not allowed to move
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-            else if (myRow < kingRow) //we are below the king
-            {
-                while (legal) //iterates through moves until no longer legal
-                {
-                    distance++;//increments the distance from potentially pinned piece
-                    if (myRow-distance <= 0 || myCol-distance <= 0) //makes sure the move isn't out of bounds
-                    {
-                        return false; //piece is not pinned
-                    }
-                    else {
-                        ChessPosition temp = new ChessPosition(myRow-distance, myCol-distance); //selects the next spot below the pinned? piece
-                        ChessPiece test = board.getPiece(temp); //gets the piece on the square targeted
-                        if (test.getPieceType() == PieceType.BISHOP || test.getPieceType() == PieceType.QUEEN) //there's a bishop or queen that's pinning if it's an enemy
-                        {
-                            if (test.getTeamColor() != friendlyKing.getPiece().getTeamColor()) //oh snap it's an enemy
-                                return true; //piece is pinned, not allowed to move
-                        } else
-                            return false; //piece is not pinned (can only be pinned from one direction)
-                    }
-                }
-            }
-        }
-        else if (kingRow - myRow == myCol - kingCol) //same diagonal, check for bishop or queen
-        {
-
-        }
-        else
-            return false;
-        return false;
     }
 
     @Override
