@@ -16,6 +16,10 @@ public class ChessGame {
     ChessBoard board;
     ChessMove lastMove;
     ChessPiece lastMoveCaptured;
+    boolean whiteqsc;
+    boolean whiteksc;
+    boolean blackqsc;
+    boolean blackksc;
 
     public ChessGame() {
         //make the board
@@ -27,6 +31,11 @@ public class ChessGame {
         //set start player to white
         currentPlayer = TeamColor.WHITE;
 
+        //lets the players castle from the start
+        whiteqsc = true;
+        whiteksc = true;
+        blackqsc = true;
+        blackksc = true;
     }
 
     /**
@@ -90,6 +99,9 @@ public class ChessGame {
             board.addPiece(next.getStartPosition(), piece);
             board.addPiece(next.getEndPosition(), slainpiece);
         }
+
+        legalMoves.addAll(castleMoves(startPosition));
+
         return legalMoves;
     }
 
@@ -110,7 +122,6 @@ public class ChessGame {
         if (mypiece.getTeamColor() != currentPlayer)
             throw new InvalidMoveException();
 
-
         //make sure that the move being made can be made by that piece
         java.util.Collection<ChessMove> moves = validMoves(move.getStartPosition());
         if (!moves.contains(move))
@@ -129,6 +140,37 @@ public class ChessGame {
         else
             board.addPiece(move.getEndPosition(), mypiece);
 
+        //castling move
+        if (mypiece.getPieceType() == ChessPiece.PieceType.KING)
+        { //castle moves are the only king moves where the king moves two squares
+            if (move.getStartPosition().getColumn() - move.getEndPosition().getColumn() == 2
+            || move.getStartPosition().getColumn() - move.getEndPosition().getColumn() == -2)
+            {
+                //it's a castling move
+                ChessPiece rook = new ChessPiece(mypiece.getTeamColor(), ChessPiece.PieceType.ROOK);
+                if (move.getEndPosition().getRow() == 1) {
+                    if (move.getEndPosition().getColumn() == 7){
+                        board.removePiece(new ChessPosition(1,8));
+                        board.addPiece(new ChessPosition(1,6), rook); //rook needs to move too
+                    }
+                    else if (move.getEndPosition().getColumn() == 3){
+                        board.removePiece(new ChessPosition(1,1));
+                        board.addPiece(new ChessPosition(1,4), rook); //rook needs to move too
+                    }
+                }
+                else if (move.getEndPosition().getRow() == 8) {
+                    if (move.getEndPosition().getColumn() == 7){
+                        board.removePiece(new ChessPosition(8,8));
+                        board.addPiece(new ChessPosition(8,6), rook); //rook needs to move too
+                    }
+                    else if (move.getEndPosition().getColumn() == 3){
+                        board.removePiece(new ChessPosition(8,1));
+                        board.addPiece(new ChessPosition(8,4), rook); //rook needs to move too
+                    }
+                }
+            }
+        }
+
         //if the move causes the player to be in check, reverse the move (it's invalid)
         if (this.isInCheck(currentPlayer))
         {
@@ -138,12 +180,49 @@ public class ChessGame {
             throw new InvalidMoveException("is still in check");
         }
 
+        //if the piece moved could have been the king or rooks, it removes the possibility of certain kinds of castling
+        if(move.getStartPosition().getRow() == 1) {
+            if (move.getStartPosition().getColumn() == 1)
+                whiteqsc = false;
+            else if (move.getStartPosition().getColumn() == 8)
+                whiteksc = false;
+            else if (move.getStartPosition().getColumn() == 5) {
+                whiteqsc = false;
+                whiteksc = false;
+            }
+        }
+        else if(move.getStartPosition().getRow() == 8) {
+            if (move.getStartPosition().getColumn() == 1)
+                blackqsc = false;
+            else if (move.getStartPosition().getColumn() == 8)
+                blackksc = false;
+            else if (move.getStartPosition().getColumn() == 5) {
+                blackqsc = false;
+                blackksc = false;
+            }
+        }
+
+        //if the move could have captured a rook, then the king can't castle that way
+        if (move.getEndPosition().getRow() == 1) {
+            if (move.getEndPosition().getColumn() == 1)
+                whiteqsc = false;
+            else if (move.getEndPosition().getColumn() == 8)
+                whiteksc = false;
+        }
+        else if(move.getStartPosition().getRow() == 8) {
+            if (move.getEndPosition().getColumn() == 1)
+                blackqsc = false;
+            else if (move.getEndPosition().getColumn() == 8)
+                blackksc = false;
+        }
 
         //switch teams
         if (currentPlayer == TeamColor.WHITE)
             currentPlayer = TeamColor.BLACK;
         else if (currentPlayer == TeamColor.BLACK)
             currentPlayer = TeamColor.WHITE;
+
+
 
     }
 
@@ -222,6 +301,11 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        whiteqsc = true;
+        whiteksc = true;
+        blackqsc = true;
+        blackksc = true;
+
     }
 
     /**
@@ -318,6 +402,76 @@ public class ChessGame {
         //there's no escape move for the king, and no piece can legally move
         //it's checkmate or stalemate
         return true;
+    }
+
+    //returns a collection of legal castling moves
+    public Collection<ChessMove> castleMoves(ChessPosition startPosition)
+    {
+        Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
+        ChessPiece piece = board.getPiece(startPosition);
+        if (!board.squareAttacked(piece.getTeamColor(), startPosition).isEmpty()) {//if the king is in check
+            return legalMoves; //cannot castle while in check
+        }
+
+
+        // castling rules
+        //white castling
+        if(startPosition.getRow() == 1 && startPosition.getColumn() == 5
+                && piece.getTeamColor() == TeamColor.WHITE
+                && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (whiteksc) { //make sure castling kingside is legal (king/rook hasn't moved)
+                ChessPosition bishop = new ChessPosition (1,6);
+                ChessPosition knight = new ChessPosition (1,7);
+                if (board.getPiece(bishop) == null && board.getPiece(knight) == null) //first make sure no pieces are in the way and there's a rook still
+                    if (board.squareAttacked(TeamColor.BLACK, bishop).isEmpty()
+                    && board.squareAttacked(TeamColor.BLACK, knight).isEmpty()) //then make sure the king isn't attacked on his way
+                        {
+                            ChessMove move = new ChessMove(startPosition, knight, null);
+                            legalMoves.add(move); //if there are no problems, the king can castle kingside
+                        }
+            }
+            if (whiteqsc){
+                ChessPosition queen = new ChessPosition (1,4);
+                ChessPosition bishop = new ChessPosition (1,3);
+                ChessPosition knight = new ChessPosition (1,2);
+                if (board.getPiece(queen) == null && board.getPiece(bishop) == null && board.getPiece(knight) == null) //first make sure no pieces are in the way
+                    if (board.squareAttacked(TeamColor.BLACK, queen).isEmpty()
+                    && board.squareAttacked(TeamColor.BLACK, bishop).isEmpty()) //then make sure the king isn't attacked on his way
+                    {
+                        ChessMove move = new ChessMove(startPosition, bishop, null);
+                        legalMoves.add(move); //if there are no problems, the king can castle queenside
+                    }
+            }
+        }
+        //black castling
+        else if(startPosition.getRow() == 8 && startPosition.getColumn() == 5
+                && piece.getTeamColor() == TeamColor.BLACK
+                && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (blackksc) { //make sure castling kingside is legal (king/rook hasn't moved)
+                ChessPosition bishop = new ChessPosition (8,6);
+                ChessPosition knight = new ChessPosition (8,7);
+                if (board.getPiece(bishop) == null && board.getPiece(knight) == null) //first make sure no pieces are in the way
+                    if (board.squareAttacked(TeamColor.WHITE, bishop).isEmpty()
+                            && board.squareAttacked(TeamColor.WHITE, knight).isEmpty()) //then make sure the king isn't attacked on his way
+                    {
+                        ChessMove move = new ChessMove(startPosition, knight, null);
+                        legalMoves.add(move); //if there's no problems, the king can castle kingside
+                    }
+            }
+            if (blackqsc){
+                ChessPosition queen = new ChessPosition (8,4);
+                ChessPosition bishop = new ChessPosition (8,3);
+                ChessPosition knight = new ChessPosition (8,2);
+                if (board.getPiece(queen) == null && board.getPiece(bishop) == null && board.getPiece(knight) == null) //first make sure no pieces are in the way
+                    if (board.squareAttacked(TeamColor.WHITE, queen).isEmpty()
+                            && board.squareAttacked(TeamColor.WHITE, bishop).isEmpty()) //then make sure the king isn't attacked on his way
+                    {
+                        ChessMove move = new ChessMove(startPosition, bishop, null);
+                        legalMoves.add(move); //if there's no problems, the king can castle queenside
+                    }
+            }
+        }
+        return legalMoves; //contains all the castling moves available
     }
 
     @Override
