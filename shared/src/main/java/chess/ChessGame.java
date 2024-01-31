@@ -189,7 +189,7 @@ public class ChessGame {
         }
 
         //if it was an en passant move, make sure to capture the enemy pawn
-        if (lastMove != null) {
+        if (lastMove != null && lastpiece != null) {
             if (lastpiece.getPieceType() == ChessPiece.PieceType.PAWN) {
                 if (lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow() == 2
                         || lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow() == -2) {
