@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -77,6 +78,9 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         //get the possible moves that piece can make and set up possible legal moves
         Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition);
+        //include en Passant - also needs to be verified as legal
+        pieceMoves.addAll(enPassantMoves(startPosition));
+
         Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
 
         java.util.Iterator<ChessMove> pieceiterator = pieceMoves.iterator();
@@ -114,6 +118,10 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //get the starting piece
         ChessPiece mypiece = board.getPiece(move.getStartPosition());
+        //get the piece that made the last move (important for en passant)
+        ChessPiece lastpiece = null;
+        if (lastMove != null)
+             lastpiece = board.getPiece(lastMove.getEndPosition());
 
         //if no starting piece or piece is the wrong color, it's an invalid move
         if (mypiece == null)
@@ -180,6 +188,32 @@ public class ChessGame {
             throw new InvalidMoveException("is still in check");
         }
 
+        //if it was an en passant move, make sure to capture the enemy pawn
+        if (lastMove != null) {
+            if (lastpiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                if (lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow() == 2
+                        || lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow() == -2) {
+                    //the last move was a double pawn move
+
+                    //if the move made was en passant
+                    if (move.getEndPosition().getColumn() == lastMove.getEndPosition().getColumn()
+                            && mypiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                        //pawns on the same column
+                        if (mypiece.getTeamColor() == TeamColor.WHITE && move.getEndPosition().getRow() == 6) {
+                            //OFFICIAL EN PASSANT
+                            board.removePiece(lastMove.getEndPosition());
+                        } else if (mypiece.getTeamColor() == TeamColor.BLACK && move.getEndPosition().getRow() == 3) {
+                            //OFFICIAL EN PASSANT
+                            board.removePiece(lastMove.getEndPosition());
+                        }
+                    }
+                }
+            }
+        }
+
+        lastMove = move;
+
+
         //if the piece moved could have been the king or rooks, it removes the possibility of certain kinds of castling
         if(move.getStartPosition().getRow() == 1) {
             if (move.getStartPosition().getColumn() == 1)
@@ -221,9 +255,6 @@ public class ChessGame {
             currentPlayer = TeamColor.BLACK;
         else if (currentPlayer == TeamColor.BLACK)
             currentPlayer = TeamColor.WHITE;
-
-
-
     }
 
     /**
@@ -405,7 +436,7 @@ public class ChessGame {
     }
 
     //returns a collection of legal castling moves
-    public Collection<ChessMove> castleMoves(ChessPosition startPosition)
+    private Collection<ChessMove> castleMoves(ChessPosition startPosition)
     {
         Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
         ChessPiece piece = board.getPiece(startPosition);
@@ -473,6 +504,62 @@ public class ChessGame {
         }
         return legalMoves; //contains all the castling moves available
     }
+
+    private Collection<ChessMove> enPassantMoves(ChessPosition startPosition){
+
+        Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
+        ChessPiece piece = board.getPiece(startPosition);
+        int row = startPosition.getRow();
+        int col = startPosition.getColumn();
+
+        //only pawns can en passant
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            return legalMoves;
+        }
+
+        //and even then, only on the fourth or fifth rank
+        if (piece.getTeamColor() == TeamColor.WHITE && row != 5) {
+            return legalMoves;
+        }
+        else if (piece.getTeamColor() == TeamColor.BLACK && row != 4) {
+            return legalMoves;
+        }
+
+        ChessPiece enemypiece = board.getPiece(lastMove.getEndPosition());
+
+        //if the last move the enemy made was a double pawn move
+        if (enemypiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            if (lastMove.getStartPosition().getRow() == 7 && lastMove.getEndPosition().getRow() == 5) {
+                //black made a double pawn move
+                if (col + 1 == lastMove.getEndPosition().getColumn()) {
+                    ChessPosition temp = new ChessPosition(row+1, col+1);
+                    ChessMove move = new ChessMove (startPosition, temp, null);
+                    legalMoves.add(move);
+                }
+                else if (col - 1 == lastMove.getEndPosition().getColumn()) {
+                    ChessPosition temp = new ChessPosition(row+1, col-1);
+                    ChessMove move = new ChessMove (startPosition, temp, null);
+                    legalMoves.add(move);
+                }
+            }
+            else if (lastMove.getStartPosition().getRow() == 2 && lastMove.getEndPosition().getRow() == 4) {
+                //white made a double pawn move
+                if (col + 1 == lastMove.getEndPosition().getColumn()) {
+                    ChessPosition temp = new ChessPosition(row-1, col+1);
+                    ChessMove move = new ChessMove (startPosition, temp, null);
+                    legalMoves.add(move);
+                }
+                else if (col - 1 == lastMove.getEndPosition().getColumn()) {
+                    ChessPosition temp = new ChessPosition(row-1, col-1);
+                    ChessMove move = new ChessMove (startPosition, temp, null);
+                    legalMoves.add(move);
+                }
+            }
+        }
+
+        return legalMoves;
+    }
+
 
     @Override
     public boolean equals(Object o) {
