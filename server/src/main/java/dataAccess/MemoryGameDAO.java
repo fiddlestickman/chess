@@ -3,15 +3,12 @@ package dataAccess;
 import model.GameData;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
 
-public class MemoryGameDAO implements GameDAO {
+public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
     private static MemoryGameDAO INSTANCE;
-    private final ArrayList<GameData> gameDatabase;
 
     private MemoryGameDAO() {
-        gameDatabase = new ArrayList<>();
+        super();
     }
 
     public static MemoryGameDAO getInstance() {
@@ -21,39 +18,20 @@ public class MemoryGameDAO implements GameDAO {
         return INSTANCE;
     }
 
-    public void createGame(GameData g) throws DataAccessException {
-        gameDatabase.add(g);
-    }
-    public Collection<GameData> readUser(String username) throws DataAccessException {
+    public Collection<GameData> readUser(String username) {
         ArrayList<GameData> output = new ArrayList<>();
-        Iterator<GameData> iter =  gameDatabase.iterator();
-        while(iter.hasNext()) {
-            GameData next = iter.next();
-            if (Objects.equals(next.whiteUsername(), username))
-                output.add(next);
-        }
+        GameData temp = new GameData(0, username, username,"", null);
+        output.addAll(super.readAll(temp, "whiteUsername"));
+        output.addAll(super.readAll(temp, "blackUsername"));
         return output;
     }
-    public GameData readGameID(int ID) throws DataAccessException {
-        Iterator<GameData> iter =  gameDatabase.iterator();
-        while(iter.hasNext()) {
-            GameData next = iter.next();
-            if (Objects.equals(next.gameID(), ID))
-                return next;
-        }
-        return null;
+
+    public GameData readGameID(int ID) {
+        GameData temp = new GameData(ID, "", "","", null);
+        return super.read(temp, "gameID");
     }
-    public void update(GameData g) throws DataAccessException {
-        Iterator<GameData> iter =  gameDatabase.iterator();
-        while(iter.hasNext()) {
-            GameData next = iter.next();
-            if (Objects.equals(next.gameID(), g.gameID())){
-                gameDatabase.remove(next);
-                gameDatabase.add(g);
-            }
-        }
-    }
-    public void delete(GameData g) throws DataAccessException {
-        gameDatabase.remove(g);
+
+    public void update(GameData g) {
+        super.update(g, "gameID");
     }
 }

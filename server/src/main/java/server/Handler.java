@@ -11,4 +11,24 @@ public class Handler {
         System.out.println("♕ 240 Chess Server: " + piece);
     }
 
+    /*
+    Here's how you do singleton implementation (good for handlers)
+
+    private static MemoryAuthDAO INSTANCE;
+    private final ArrayList<AuthData> authDatabase;
+
+    private MemoryAuthDAO() {
+        authDatabase = new ArrayList<>();
+    }
+
+    public static MemoryAuthDAO getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new MemoryAuthDAO();
+        }
+        return INSTANCE;
+    }
+
+     */
+
+
 }
