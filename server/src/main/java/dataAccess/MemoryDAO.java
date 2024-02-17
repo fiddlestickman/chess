@@ -9,18 +9,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class MemoryDAO<T> {
+class MemoryDAO<T> {
     protected ArrayList<T> database;
+    protected int index;
     private interface SearchOperation {
         Object doSomething(Object searchedfor, Object nextinbase);
     }
 
     protected MemoryDAO() {
         database = new ArrayList<>();
+        index = 0;
     }
 
-    public void create(T t) {
+    public int create(T t) {
         database.add(t);
+        return index++;
     }
 
     //finds the first object in the database that share a specific subfield 'var' of the given object 't'

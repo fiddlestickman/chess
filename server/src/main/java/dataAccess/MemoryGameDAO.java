@@ -18,6 +18,12 @@ public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
         return INSTANCE;
     }
 
+    public int create(GameData g) {
+        GameData indexed = new GameData(index, g.whiteUsername(), g.blackUsername(), g.gameName(), g.game());
+        database.add(indexed);
+        return index++;
+    }
+
     public Collection<GameData> readUser(String username) {
         ArrayList<GameData> output = new ArrayList<>();
         GameData temp = new GameData(0, username, username,"", null);
@@ -26,8 +32,8 @@ public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
         return output;
     }
 
-    public GameData readGameID(int ID) {
-        GameData temp = new GameData(ID, "", "","", null);
+    public GameData readGameID(int gameID) {
+        GameData temp = new GameData(gameID, "", "","", null);
         return super.read(temp, "gameID");
     }
 
