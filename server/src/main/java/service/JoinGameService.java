@@ -4,8 +4,7 @@ import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
-import model.AuthData;
-import model.GameData;
+import model.*;
 
 public class JoinGameService extends Service{
     public JoinGameService() {}

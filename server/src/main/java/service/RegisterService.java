@@ -1,10 +1,7 @@
 package service;
 
 import dataAccess.*;
-import model.AuthData;
-import model.UserData;
-
-import java.util.Objects;
+import model.*;
 
 public class RegisterService extends Service {
     public RegisterService() {}

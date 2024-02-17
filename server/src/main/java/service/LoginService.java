@@ -14,6 +14,8 @@ public class LoginService extends Service {
         AuthData auth;
 
         user = userdao.readUserName(username);
+        if (user == null)
+            throw new ServiceException("User not found");
         if (!Objects.equals(user.password(), password)) {
             throw new ServiceException("Wrong password");
         }

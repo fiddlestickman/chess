@@ -1,13 +1,10 @@
 package dataAccess;
 
-import model.GameData;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 
 class MemoryDAO<T> {
     protected ArrayList<T> database;
@@ -29,8 +26,8 @@ class MemoryDAO<T> {
     //finds the first object in the database that share a specific subfield 'var' of the given object 't'
     //should only be one object if service is done correctly
     public T read(T t, String var) {
-        SearchOperation update = (search, inbase) -> {return inbase;};
-        ArrayList<T> output = search(t, var, update);
+        SearchOperation read = (search, inbase) -> {return inbase;};
+        ArrayList<T> output = search(t, var, read, database.iterator());
         if (output.isEmpty()) {
             return null;
         }
@@ -41,13 +38,15 @@ class MemoryDAO<T> {
 
     //finds all objects in the database that share a specific subfield of that object
     public Collection<T> readAll(T t, String var) {
-        SearchOperation update = (search, inbase) -> {return inbase;};
-        return search(t, var, update);
+        SearchOperation readAll = (search, inbase) -> {return inbase;};
+        return search(t, var, readAll, database.iterator());
     }
 
     public void update(T newvalue, String var) {
-        SearchOperation update = (search, inbase) -> { database.remove((T) inbase); database.add((T) search); return null;};
-        search(newvalue, var, update);
+        Iterator<T> iter = database.iterator();
+        SearchOperation update = (search, inbase) -> { iter.remove(); return null;};
+        search(newvalue, var, update, iter);
+        database.add(newvalue);
     }
 
     public void delete(T t) {
@@ -58,16 +57,15 @@ class MemoryDAO<T> {
         database.clear();
     }
 
-    private ArrayList<T> search(T t, String var, SearchOperation operate) {
+    private ArrayList<T> search(T t, String var, SearchOperation operate, Iterator<T> iter) {
         ArrayList<T> output = new ArrayList<>();
-        Iterator<T> iter = database.iterator();
         try {
             Method temp = t.getClass().getMethod(var, null);
             while (iter.hasNext()) {
                 T next = iter.next();
                 Object nextinbase = temp.invoke(next);
                 Object searchedfor = temp.invoke(t);
-                if (nextinbase.equals(searchedfor)) {
+                if (nextinbase!= null && nextinbase.equals(searchedfor)) {
                     output.add((T) operate.doSomething(t, next));
                 }
             }

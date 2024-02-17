@@ -1,8 +1,7 @@
 package service;
 
 import dataAccess.*;
-import model.AuthData;
-import model.GameData;
+import model.*;
 
 import java.util.Collection;
 

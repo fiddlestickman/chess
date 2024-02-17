@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryAuthDAO;
-import model.*;
+import model.AuthData;
 
 class Service {
     protected static String ALPHANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -13,7 +13,8 @@ class Service {
         SecureRandom temp = new SecureRandom();
         StringBuilder authMake = new StringBuilder();
         for (int i = 0; i < 20; i++) {
-            authMake.append(temp.nextInt(ALPHANUM.length()));
+            char next = ALPHANUM.charAt(temp.nextInt(ALPHANUM.length()));
+            authMake.append(next);
         }
         return authMake.toString();
     }
