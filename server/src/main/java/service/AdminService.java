@@ -2,9 +2,9 @@ package service;
 
 import dataAccess.*;
 
-public class ClearService {
+public class AdminService {
 
-    public ClearService() {}
+    public AdminService() {}
 
     public void Clear() throws DataAccessException {
         AuthDAO authDAO = MemoryAuthDAO.getInstance();
