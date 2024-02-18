@@ -17,7 +17,7 @@ public class Handler {
         try {
             return gson.fromJson(body, classType);
         } catch (JsonSyntaxException e) {
-            throw new RequestException("Incorrect data");
+            throw new RequestException("bad request");
         }
     }
 

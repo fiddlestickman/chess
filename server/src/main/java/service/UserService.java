@@ -39,10 +39,10 @@ public class UserService extends Service {
         AuthData auth;
         user = userdao.readUserName(username);
         if (user != null)
-            throw new ServiceException("Username taken");
+            throw new ServiceException("already taken");
         user = userdao.readUserEmail(email);
         if (user != null)
-            throw new ServiceException("Email already connected to account");
+            throw new ServiceException("already taken");
         user = new UserData(username, password, email);
         userdao.create(user);
         auth = new AuthData(CreateAuthToken(), username);

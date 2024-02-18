@@ -7,7 +7,7 @@ import service.UserService;
 
 public class UserHandler extends Handler {
     private static UserHandler INSTANCE;
-    private UserService userserve;
+    private final UserService userserve;
     private UserHandler() {
         userserve = new UserService();
     }
@@ -34,7 +34,6 @@ public class UserHandler extends Handler {
         }
     }
 
-
     public Object LogoutRequest(spark.Request req, spark.Response res) {
         try {
             String auth = req.headers("authorization");
@@ -58,7 +57,7 @@ public class UserHandler extends Handler {
             res.status(200);
             return res;
         } catch (DataAccessException e) { return Error(e, res, 500);
-        } catch (ServiceException e) { return Error(e, res, 401);
+        } catch (ServiceException e) { return Error(e, res, 403);
         } catch (RequestException e) { return Error(e, res, 400);
         }
     }
