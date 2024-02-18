@@ -27,9 +27,6 @@ private static void createRoutes() {
     Spark.post("/game", (req, res) -> GameHandler.getInstance().CreateGameRequest(req, res));
     Spark.put("/game", (req, res) -> GameHandler.getInstance().JoinGameRequest(req, res));
 }
-
-
-
 public void stop() {
         Spark.stop();
         Spark.awaitStop();
