@@ -16,9 +16,9 @@ public class UserService extends Service {
 
         user = userdao.readUserName(username);
         if (user == null)
-            throw new ServiceException("Unauthorized");
+            throw new ServiceException("unauthorized", 401);
         if (!Objects.equals(user.password(), password)) {
-            throw new ServiceException("Unauthorized");
+            throw new ServiceException("unauthorized", 401);
         }
         auth = new AuthData(CreateAuthToken(), username);
         authDAO.create(auth);
@@ -39,10 +39,17 @@ public class UserService extends Service {
         AuthData auth;
         user = userdao.readUserName(username);
         if (user != null)
-            throw new ServiceException("already taken");
+            throw new ServiceException("already taken", 403);
         user = userdao.readUserEmail(email);
         if (user != null)
-            throw new ServiceException("already taken");
+            throw new ServiceException("already taken", 403);
+        if (username == null)
+            throw new ServiceException("bad request", 400);
+        if (password == null)
+            throw new ServiceException("bad request", 400);
+        if (email == null)
+            throw new ServiceException("bad request", 400);
+
         user = new UserData(username, password, email);
         userdao.create(user);
         auth = new AuthData(CreateAuthToken(), username);

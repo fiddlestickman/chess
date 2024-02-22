@@ -27,7 +27,7 @@ class Service {
         AuthData auth;
         auth = authDAO.readAuth(authToken);
         if (auth == null)
-            throw new ServiceException("Authentication failed");
+            throw new ServiceException("unauthorized", 401);
         return auth;
     }
 

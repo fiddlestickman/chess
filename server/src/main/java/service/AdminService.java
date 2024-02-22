@@ -10,9 +10,11 @@ public class AdminService {
         AuthDAO authDAO = MemoryAuthDAO.getInstance();
         GameDAO gameDAO = MemoryGameDAO.getInstance();
         UserDAO userDAO = MemoryUserDAO.getInstance();
+        WatchDAO watchDAO = MemoryWatchDAO.getInstance();
 
         authDAO.clear();
         gameDAO.clear();
         userDAO.clear();
+        watchDAO.clear();
     }
 }

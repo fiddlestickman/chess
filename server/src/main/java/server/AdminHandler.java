@@ -7,7 +7,10 @@ import spark.Spark;
 
 public class AdminHandler extends Handler {
     private static AdminHandler INSTANCE;
-    private AdminHandler() {}
+    private AdminHandler() {
+        admin = new AdminService();
+    }
+    private AdminService admin;
 
     public static AdminHandler getInstance() {
         if(INSTANCE == null) {
@@ -16,17 +19,14 @@ public class AdminHandler extends Handler {
         return INSTANCE;
     }
 
-    public Object HandleRequest(spark.Request req, spark.Response res) {
-        AdminService admin = new AdminService();
+    public Object ClearRequest(spark.Request req, spark.Response res) {
+        Response response = new Response();
         try {
             admin.Clear();
             res.status(200);
-            return res;
-        } catch (DataAccessException e) {
-            res.status(500);
-            String jmessage = Serialize(e);
-            res.body(jmessage);
-            return res;
+            response.success = true;
+            return Serialize(response);
+        } catch (DataAccessException e) { return Error(e, res, 500);
         }
     }
 }

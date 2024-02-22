@@ -1,11 +1,14 @@
 package dataAccess;
 
 import model.GameData;
+import model.WatchData;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
     private static MemoryGameDAO INSTANCE;
+    private ArrayList<WatchData> watchDatabase; //holds pairs of username and gameID
 
     private MemoryGameDAO() {
         super();
@@ -37,6 +40,7 @@ public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
     public GameData readGameID(int gameID) {
         GameData temp = new GameData(gameID, "", "","", null);
         return super.read(temp, "gameID");
+
     }
 
     public void update(GameData g) {

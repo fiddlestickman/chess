@@ -9,7 +9,7 @@ public class Main {
         //System.out.println("♕ 240 Chess Server: " + piece);
 
         Server server = new Server();
-        server.run(8080);
+        server.run(2345);
 
         ChessGame game = new ChessGame();
         Handler temp = new Handler();
