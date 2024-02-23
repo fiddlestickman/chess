@@ -2,7 +2,6 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import model.AuthToken;
 
 public class Handler {
 
@@ -17,7 +16,7 @@ public class Handler {
         try {
             return gson.fromJson(body, classType);
         } catch (JsonSyntaxException e) {
-            if (classType == AuthToken.class)
+            if (classType == String.class)
                 throw new RequestException("unauthorized", 401);
             throw new RequestException("bad request", 400);
         }

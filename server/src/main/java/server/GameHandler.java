@@ -26,9 +26,8 @@ public class GameHandler extends Handler {
     public Object ListGamesRequest(spark.Request req, spark.Response res) {
         ListResponse response = new ListResponse();
         try {
-            String auth = req.headers("authorization");
-            AuthToken data = (AuthToken) Deserialize(auth, AuthToken.class);
-            ArrayList<GameData> games = new ArrayList<>(gameserve.ListGames(data.authToken()));
+            String auth = (String)Deserialize(req.headers("authorization"), String.class);
+            ArrayList<GameData> games = new ArrayList<>(gameserve.ListGames(auth));
             res.body(Serialize(games));
             res.status(200);
             response.success=true;
@@ -43,10 +42,9 @@ public class GameHandler extends Handler {
     public Object CreateGameRequest(spark.Request req, spark.Response res) {
         CreateResponse response = new CreateResponse();
         try {
-            String auth = req.headers("authorization");
-            AuthToken authToken = (AuthToken) Deserialize(auth, AuthToken.class);
+            String auth = (String)Deserialize(req.headers("authorization"), String.class);
             CreateGameData data = (CreateGameData) Deserialize(req.body(), CreateGameData.class);
-            int gameID = gameserve.CreateGame(authToken.authToken(), data.gameName());
+            int gameID = gameserve.CreateGame(auth, data.gameName());
             GameIDData gameIDdata = new GameIDData(gameID);
             res.body(Serialize(gameIDdata));
             res.status(200);
@@ -61,10 +59,9 @@ public class GameHandler extends Handler {
     public Object JoinGameRequest(spark.Request req, spark.Response res) {
         JoinResponse response = new JoinResponse();
         try {
-            String auth = req.headers("authorization");
-            AuthToken authToken = (AuthToken) Deserialize(auth, AuthToken.class);
+            String auth = (String)Deserialize(req.headers("authorization"), String.class);
             JoinGameData data = (JoinGameData) Deserialize(req.body(), JoinGameData.class);
-            gameserve.JoinGame(authToken.authToken(), data.playerColor(), data.gameID());
+            gameserve.JoinGame(auth, data.playerColor(), data.gameID());
             res.status(200);
             response.success = true;
             response.GameID = data.gameID();

@@ -26,8 +26,7 @@ public class UserHandler extends Handler {
             LoginData data = (LoginData) Deserialize(json, LoginData.class);
             String authToken = userserve.Login(data.username(), data.password());
             res.status(200);
-            AuthData authData = new AuthData(authToken, data.username());
-            res.body(Serialize(authData));
+            res.body(Serialize(authToken));
             response.success=true;
             response.authToken=authToken;
             response.username=data.username();
@@ -41,9 +40,8 @@ public class UserHandler extends Handler {
     public Object LogoutRequest(spark.Request req, spark.Response res) {
         Response response = new Response();
         try {
-            String auth = req.headers("authorization");
-            AuthToken data = (AuthToken) Deserialize(auth, AuthToken.class);
-            userserve.Logout(data.authToken());
+            String auth = (String)Deserialize(req.headers("authorization"), String.class);
+            userserve.Logout(auth);
             res.status(200);
             response.success = true;
             return Serialize(response);
@@ -59,7 +57,7 @@ public class UserHandler extends Handler {
             String body = req.body();
             UserData data = (UserData) Deserialize(body, UserData.class);
             String auth = userserve.Register(data.username(), data.password(), data.email());
-            String authToken = Serialize(new AuthToken(auth));
+            String authToken = Serialize(auth);
             res.body(authToken);
             res.status(200);
             response.success=true;

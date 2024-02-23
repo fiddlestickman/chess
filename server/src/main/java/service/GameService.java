@@ -55,6 +55,10 @@ public class GameService extends Service {
         GameDAO gameDAO = MemoryGameDAO.getInstance();
         WatchDAO watchDAO = MemoryWatchDAO.getInstance();
         AuthData auth = Authenticate(authToken);
+
+        return gameDAO.readAll();
+
+        /* This code is if you want to list only the games that you are watching or playing in
         Collection<GameData> games = gameDAO.readUser(auth.username());
         Collection<WatchData> watch = watchDAO.readUser(auth.username());
         ArrayList<Integer> gameIDs = new ArrayList<>();
@@ -67,6 +71,9 @@ public class GameService extends Service {
         while (gameIter.hasNext()){
             games.add(gameDAO.readGameID(gameIter.next()));
         }
+
         return games;
+
+         */
     }
 }

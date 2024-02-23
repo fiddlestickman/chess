@@ -41,6 +41,9 @@ class MemoryDAO<T> {
         SearchOperation readAll = (search, inbase) -> {return inbase;};
         return search(t, var, readAll, database.iterator());
     }
+    public Collection<T> readAll() {
+        return database;
+    }
 
     public void update(T newvalue, String var) {
         Iterator<T> iter = database.iterator();
