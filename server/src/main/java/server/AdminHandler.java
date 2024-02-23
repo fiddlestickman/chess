@@ -19,14 +19,14 @@ public class AdminHandler extends Handler {
         return INSTANCE;
     }
 
-    public Object ClearRequest(spark.Request req, spark.Response res) {
+    public Object clearRequest(spark.Request req, spark.Response res) {
         Response response = new Response();
         try {
             admin.Clear();
             res.status(200);
             response.success = true;
-            return Serialize(response);
-        } catch (DataAccessException e) { return Error(e, res, 500);
+            return serialize(response);
+        } catch (DataAccessException e) { return error(e, res, 500);
         }
     }
 }

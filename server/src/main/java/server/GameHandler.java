@@ -23,44 +23,44 @@ public class GameHandler extends Handler {
         return INSTANCE;
     }
 
-    public Object ListGamesRequest(spark.Request req, spark.Response res) {
+    public Object listGamesRequest(spark.Request req, spark.Response res) {
         ListResponse response = new ListResponse();
         try {
-            String auth = (String)Deserialize(req.headers("authorization"), String.class);
+            String auth = (String) deserialize(req.headers("authorization"), String.class);
             ArrayList<GameData> games = new ArrayList<>(gameserve.ListGames(auth));
-            res.body(Serialize(games));
+            res.body(serialize(games));
             res.status(200);
             response.success=true;
             response.games = games;
-            return Serialize(response);
-        } catch (DataAccessException e) { return Error(e, res, 500);
-        } catch (ServiceException e) { return Error(e, res, e.getCode());
-        } catch (RequestException e) { return Error(e, res, e.getCode());
+            return serialize(response);
+        } catch (DataAccessException e) { return error(e, res, 500);
+        } catch (ServiceException e) { return error(e, res, e.getCode());
+        } catch (RequestException e) { return error(e, res, e.getCode());
         }
     }
 
-    public Object CreateGameRequest(spark.Request req, spark.Response res) {
+    public Object createGameRequest(spark.Request req, spark.Response res) {
         CreateResponse response = new CreateResponse();
         try {
-            String auth = (String)Deserialize(req.headers("authorization"), String.class);
-            CreateGameData data = (CreateGameData) Deserialize(req.body(), CreateGameData.class);
+            String auth = (String) deserialize(req.headers("authorization"), String.class);
+            CreateGameData data = (CreateGameData) deserialize(req.body(), CreateGameData.class);
             int gameID = gameserve.CreateGame(auth, data.gameName());
             GameIDData gameIDdata = new GameIDData(gameID);
-            res.body(Serialize(gameIDdata));
+            res.body(serialize(gameIDdata));
             res.status(200);
             response.success = true;
             response.gameID = gameID;
-            return Serialize(response);
-        } catch (DataAccessException e) { return Error(e, res, 500);
-        } catch (ServiceException e) { return Error(e, res, e.getCode());
-        } catch (RequestException e) { return Error(e, res, e.getCode());
+            return serialize(response);
+        } catch (DataAccessException e) { return error(e, res, 500);
+        } catch (ServiceException e) { return error(e, res, e.getCode());
+        } catch (RequestException e) { return error(e, res, e.getCode());
         }
     }
-    public Object JoinGameRequest(spark.Request req, spark.Response res) {
+    public Object joinGameRequest(spark.Request req, spark.Response res) {
         JoinResponse response = new JoinResponse();
         try {
-            String auth = (String)Deserialize(req.headers("authorization"), String.class);
-            JoinGameData data = (JoinGameData) Deserialize(req.body(), JoinGameData.class);
+            String auth = (String) deserialize(req.headers("authorization"), String.class);
+            JoinGameData data = (JoinGameData) deserialize(req.body(), JoinGameData.class);
             gameserve.JoinGame(auth, data.playerColor(), data.gameID());
             res.status(200);
             response.success = true;
@@ -70,10 +70,10 @@ public class GameHandler extends Handler {
             } else if (data.playerColor() == ChessGame.TeamColor.BLACK) {
                 response.playerColor = "BLACK";
             }
-            return Serialize(response);
-        } catch (DataAccessException e) { return Error(e, res, 500);
-        } catch (ServiceException e) { return Error(e, res, e.getCode());
-        } catch (RequestException e) { return Error(e, res, e.getCode());
+            return serialize(response);
+        } catch (DataAccessException e) { return error(e, res, 500);
+        } catch (ServiceException e) { return error(e, res, e.getCode());
+        } catch (RequestException e) { return error(e, res, e.getCode());
         }
     }
 

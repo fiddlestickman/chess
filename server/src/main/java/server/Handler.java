@@ -9,7 +9,7 @@ public class Handler {
     //then pass it off to the service.
     //also packages up the java output to something html understands
 
-    public Object Deserialize (String body, Class<?> classType) throws RequestException {
+    public Object deserialize (String body, Class<?> classType) throws RequestException {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
@@ -22,21 +22,21 @@ public class Handler {
         }
     }
 
-    public String Serialize (Object thing) {
+    public String serialize (Object thing) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
         return gson.toJson(thing);
     }
 
-    String Error (Exception e, spark.Response res, int code) {
+    String error (Exception e, spark.Response res, int code) {
         Response response = new Response();
         res.status(code);
         //String jmessage = Serialize(e);
         //res.body(jmessage);
         response.success = false;
         response.message = "Error: " + e;
-        return Serialize(response);
+        return serialize(response);
     }
 
     //step 1 - create gson object using GsonBuilder - Gson gson = builder.create();
