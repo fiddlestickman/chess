@@ -27,14 +27,6 @@ public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
         return index++;
     }
 
-    public Collection<GameData> readUser(String username) {
-        ArrayList<GameData> output = new ArrayList<>();
-        GameData temp = new GameData(0, username, username,"", null);
-
-        output.addAll(super.readAll(temp, "whiteUsername"));
-        output.addAll(super.readAll(temp, "blackUsername"));
-        return output;
-    }
     public Collection<GameData> readAll() {
         return super.readAll();
     }

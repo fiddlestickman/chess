@@ -4,6 +4,7 @@ import model.UserData;
 
 public class MemoryUserDAO extends MemoryDAO<UserData> implements UserDAO {
     private static MemoryUserDAO instance;
+
     private MemoryUserDAO() {
         super();
     }
@@ -14,15 +15,14 @@ public class MemoryUserDAO extends MemoryDAO<UserData> implements UserDAO {
         }
         return instance;
     }
+
     public UserData readUserName(String username) {
-        UserData temp = new UserData(username, "","");
+        UserData temp = new UserData(username, "", "");
         return super.read(temp, "username");
     }
+
     public UserData readUserEmail(String email) {
-        UserData temp = new UserData("", "",email);
+        UserData temp = new UserData("", "", email);
         return super.read(temp, "email");
-    }
-    public void updatePassword(UserData u) {
-        super.update(u, "username");
     }
 }
