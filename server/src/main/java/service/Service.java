@@ -8,7 +8,7 @@ import dataAccess.MemoryAuthDAO;
 import model.AuthData;
 
 class Service {
-    protected static String ALPHANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    protected final String ALPHANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     public String CreateAuthToken() {
         SecureRandom temp = new SecureRandom();
         StringBuilder authMake = new StringBuilder();

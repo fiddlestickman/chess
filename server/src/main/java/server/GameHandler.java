@@ -64,7 +64,7 @@ public class GameHandler extends Handler {
             gameserve.JoinGame(auth, data.playerColor(), data.gameID());
             res.status(200);
             response.success = true;
-            response.GameID = data.gameID();
+            response.gameID = data.gameID();
             if (data.playerColor() == ChessGame.TeamColor.WHITE) {
                 response.playerColor = "WHITE";
             } else if (data.playerColor() == ChessGame.TeamColor.BLACK) {
@@ -87,6 +87,6 @@ public class GameHandler extends Handler {
 
     class JoinResponse extends Response {
         String playerColor;
-        int GameID;
+        int gameID;
     }
 }

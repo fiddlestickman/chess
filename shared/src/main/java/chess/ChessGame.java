@@ -96,7 +96,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        //get the starting piece
         ChessPiece mypiece = board.getPiece(move.getStartPosition());
         //get the piece that made the last move (important for en passant)
         ChessPiece lastpiece = null;
@@ -126,15 +125,13 @@ public class ChessGame {
         //castling move
         if (mypiece.getPieceType() == ChessPiece.PieceType.KING) {
             makeCastleMove(move, mypiece);
-        }
-        //if the move causes the player to be in check, reverse the move (it's invalid)
+        } //if the move causes the player to be in check, reverse the move (it's invalid)
         if (this.isInCheck(currentPlayer)) {
             board.removePiece(move.getEndPosition());
             board.addPiece(move.getStartPosition(), mypiece);
             board.addPiece(move.getEndPosition(), slainpiece);
             throw new InvalidMoveException("is still in check");
-        }
-        //if it was an en passant move, make sure to capture the enemy pawn
+        } //if it was an en passant move, make sure to capture the enemy pawn
         if (lastMove != null && lastpiece != null) {
             if (lastpiece.getPieceType() == ChessPiece.PieceType.PAWN) {
                 if (lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow() == 2
@@ -176,8 +173,7 @@ public class ChessGame {
                 blackqsc = false;
                 blackksc = false;
             }
-        }
-        //if the move could have captured a rook, then the king can't castle that way
+        } //if the move could have captured a rook, then the king can't castle that way
         if (move.getEndPosition().getRow() == 1) {
             if (move.getEndPosition().getColumn() == 1)
                 whiteqsc = false;
@@ -189,8 +185,7 @@ public class ChessGame {
                 blackqsc = false;
             else if (move.getEndPosition().getColumn() == 8)
                 blackksc = false;
-        }
-        //switch teams
+        } //switch teams
         if (currentPlayer == TeamColor.WHITE)
             currentPlayer = TeamColor.BLACK;
         else if (currentPlayer == TeamColor.BLACK)
