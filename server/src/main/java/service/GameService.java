@@ -11,6 +11,8 @@ public class GameService extends Service {
     }
     public int createGame(String authToken, String gameName) throws DataAccessException, ServiceException {
         authenticate(authToken);
+        if (gameName == null)
+            throw new ServiceException("bad request", 400);
         GameDAO gameDAO = MemoryGameDAO.getInstance();
         GameData game = new GameData(0, null, null, gameName, new ChessGame());
         //the GameDAO handles gameID creation
