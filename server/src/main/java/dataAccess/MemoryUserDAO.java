@@ -3,16 +3,16 @@ package dataAccess;
 import model.UserData;
 
 public class MemoryUserDAO extends MemoryDAO<UserData> implements UserDAO {
-    private static MemoryUserDAO INSTANCE;
+    private static MemoryUserDAO instance;
     private MemoryUserDAO() {
         super();
     }
 
     public static MemoryUserDAO getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MemoryUserDAO();
+        if (instance == null) {
+            instance = new MemoryUserDAO();
         }
-        return INSTANCE;
+        return instance;
     }
     public UserData readUserName(String username) {
         UserData temp = new UserData(username, "","");

@@ -9,7 +9,7 @@ import service.ServiceException;
 import java.util.ArrayList;
 
 public class GameHandler extends Handler {
-    private static GameHandler INSTANCE;
+    private static GameHandler instance;
     private final GameService gameserve;
 
     private GameHandler() {
@@ -17,10 +17,10 @@ public class GameHandler extends Handler {
     }
 
     public static GameHandler getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new GameHandler();
+        if(instance == null) {
+            instance = new GameHandler();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public Object listGamesRequest(spark.Request req, spark.Response res) {

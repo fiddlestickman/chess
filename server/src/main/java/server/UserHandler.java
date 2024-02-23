@@ -6,17 +6,17 @@ import service.ServiceException;
 import service.UserService;
 
 public class UserHandler extends Handler {
-    private static UserHandler INSTANCE;
+    private static UserHandler instance;
     private final UserService userserve;
     private UserHandler() {
         userserve = new UserService();
     }
 
     public static UserHandler getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new UserHandler();
+        if(instance == null) {
+            instance = new UserHandler();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public Object loginRequest(spark.Request req, spark.Response res) {

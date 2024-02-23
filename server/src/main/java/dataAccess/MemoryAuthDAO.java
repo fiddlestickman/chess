@@ -3,17 +3,17 @@ package dataAccess;
 import model.AuthData;
 
 public class MemoryAuthDAO extends MemoryDAO<AuthData> implements AuthDAO {
-    private static MemoryAuthDAO INSTANCE;
+    private static MemoryAuthDAO instance;
 
     private MemoryAuthDAO() {
         super();
     }
 
     public static MemoryAuthDAO getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new MemoryAuthDAO();
+        if(instance == null) {
+            instance = new MemoryAuthDAO();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public AuthData readUser(String username) {

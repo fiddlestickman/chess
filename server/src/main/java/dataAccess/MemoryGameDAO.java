@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
-    private static MemoryGameDAO INSTANCE;
+    private static MemoryGameDAO instance;
     private ArrayList<WatchData> watchDatabase; //holds pairs of username and gameID
 
     private MemoryGameDAO() {
@@ -15,10 +15,10 @@ public class MemoryGameDAO extends MemoryDAO<GameData> implements GameDAO {
     }
 
     public static MemoryGameDAO getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new MemoryGameDAO();
+        if(instance == null) {
+            instance = new MemoryGameDAO();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public int create(GameData g) {

@@ -6,16 +6,16 @@ import java.util.Collection;
 
 public class MemoryWatchDAO extends MemoryDAO<WatchData> implements WatchDAO {
 
-    private static MemoryWatchDAO INSTANCE;
+    private static MemoryWatchDAO instance;
     private MemoryWatchDAO() {
         super();
     }
 
     public static MemoryWatchDAO getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MemoryWatchDAO();
+        if (instance == null) {
+            instance = new MemoryWatchDAO();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public Collection<WatchData> readUser(String username) {

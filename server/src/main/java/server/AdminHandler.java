@@ -6,17 +6,17 @@ import service.AdminService;
 import spark.Spark;
 
 public class AdminHandler extends Handler {
-    private static AdminHandler INSTANCE;
+    private static AdminHandler instance;
     private AdminHandler() {
         admin = new AdminService();
     }
     private AdminService admin;
 
     public static AdminHandler getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new AdminHandler();
+        if(instance == null) {
+            instance = new AdminHandler();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public Object clearRequest(spark.Request req, spark.Response res) {
