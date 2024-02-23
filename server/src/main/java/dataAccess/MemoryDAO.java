@@ -37,10 +37,6 @@ class MemoryDAO<T> {
     }
 
     //finds all objects in the database that share a specific subfield of that object
-    public Collection<T> readAll(T t, String var) {
-        SearchOperation readAll = (search, inbase) -> {return inbase;};
-        return search(t, var, readAll, database.iterator());
-    }
     public Collection<T> readAll() {
         return database;
     }
