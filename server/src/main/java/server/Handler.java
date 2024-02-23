@@ -5,10 +5,6 @@ import com.google.gson.JsonSyntaxException;
 
 public class Handler {
 
-    //this class should take calls from the server (html) and convert it to a form java understands
-    //then pass it off to the service.
-    //also packages up the java output to something html understands
-
     public Object deserialize (String body, Class<?> classType) throws RequestException {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
@@ -32,17 +28,10 @@ public class Handler {
     String error (Exception e, spark.Response res, int code) {
         Response response = new Response();
         res.status(code);
-        //String jmessage = Serialize(e);
-        //res.body(jmessage);
         response.success = false;
         response.message = "Error: " + e;
         return serialize(response);
     }
-
-    //step 1 - create gson object using GsonBuilder - Gson gson = builder.create();
-    //step 2 - deserialize JSON to Object - Chess obj = gson.fromJson(jsonString, Chess.class);
-    //step 3 - serilize object to JSON - jsonString = gson.toJson(obj);
-
     class Response {
         boolean success;
         String message = null;

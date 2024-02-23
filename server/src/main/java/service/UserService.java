@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class UserService extends Service {
     public UserService() {};
-    public String Login(String username, String password) throws DataAccessException, ServiceException {
+    public String login(String username, String password) throws DataAccessException, ServiceException {
         UserDAO userdao = MemoryUserDAO.getInstance();
         AuthDAO authDAO = MemoryAuthDAO.getInstance();
         UserData user;
@@ -20,19 +20,19 @@ public class UserService extends Service {
         if (!Objects.equals(user.password(), password)) {
             throw new ServiceException("unauthorized", 401);
         }
-        auth = new AuthData(CreateAuthToken(), username);
+        auth = new AuthData(createAuthToken(), username);
         authDAO.create(auth);
         return auth.authToken();
     }
 
-    public void Logout(String authToken) throws DataAccessException, ServiceException {
+    public void logout(String authToken) throws DataAccessException, ServiceException {
         AuthDAO authDAO = MemoryAuthDAO.getInstance();
         AuthData auth;
-        auth = Authenticate(authToken);
+        auth = authenticate(authToken);
         authDAO.delete(auth);
     }
 
-    public String Register(String username, String password, String email) throws DataAccessException, ServiceException {
+    public String register(String username, String password, String email) throws DataAccessException, ServiceException {
         UserDAO userdao = MemoryUserDAO.getInstance();
         UserData user;
         AuthDAO authDAO = MemoryAuthDAO.getInstance();
@@ -52,7 +52,7 @@ public class UserService extends Service {
 
         user = new UserData(username, password, email);
         userdao.create(user);
-        auth = new AuthData(CreateAuthToken(), username);
+        auth = new AuthData(createAuthToken(), username);
         authDAO.create(auth);
         return auth.authToken();
     }

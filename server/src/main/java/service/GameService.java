@@ -1,33 +1,24 @@
 package service;
 
 import chess.ChessGame;
-import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
-import dataAccess.MemoryGameDAO;
-import dataAccess.WatchDAO;
-import dataAccess.MemoryWatchDAO;
-import model.AuthData;
-import model.GameData;
-import model.WatchData;
-
-import java.util.ArrayList;
+import dataAccess.*;
+import model.*;
 import java.util.Collection;
-import java.util.Iterator;
 
 public class GameService extends Service {
 
     public GameService() {
     }
-    public int CreateGame(String authToken, String gameName) throws DataAccessException, ServiceException {
-        Authenticate(authToken);
+    public int createGame(String authToken, String gameName) throws DataAccessException, ServiceException {
+        authenticate(authToken);
         GameDAO gameDAO = MemoryGameDAO.getInstance();
         GameData game = new GameData(0, null, null, gameName, new ChessGame());
         //the GameDAO handles gameID creation
         return gameDAO.create(game);
     }
-    public void JoinGame(String authToken, ChessGame.TeamColor teamColor, int gameID) throws DataAccessException, ServiceException {
+    public void joinGame(String authToken, ChessGame.TeamColor teamColor, int gameID) throws DataAccessException, ServiceException {
         GameDAO gameDAO = MemoryGameDAO.getInstance();
-        AuthData auth = Authenticate(authToken);
+        AuthData auth = authenticate(authToken);
         if (gameDAO.readGameID(gameID) == null)
             throw new ServiceException("bad request", 400);
         GameData game = gameDAO.readGameID(gameID);
@@ -51,10 +42,10 @@ public class GameService extends Service {
             watchDAO.create(newwatcher);
         }
     }
-    public Collection<GameData> ListGames(String authToken) throws DataAccessException , ServiceException {
+    public Collection<GameData> listGames(String authToken) throws DataAccessException , ServiceException {
         GameDAO gameDAO = MemoryGameDAO.getInstance();
         WatchDAO watchDAO = MemoryWatchDAO.getInstance();
-        AuthData auth = Authenticate(authToken);
+        AuthData auth = authenticate(authToken);
 
         return gameDAO.readAll();
     }

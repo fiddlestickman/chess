@@ -22,7 +22,7 @@ public class AdminHandler extends Handler {
     public Object clearRequest(spark.Request req, spark.Response res) {
         Response response = new Response();
         try {
-            admin.Clear();
+            admin.clear();
             res.status(200);
             response.success = true;
             return serialize(response);

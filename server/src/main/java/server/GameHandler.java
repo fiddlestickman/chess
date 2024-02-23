@@ -27,7 +27,7 @@ public class GameHandler extends Handler {
         ListResponse response = new ListResponse();
         try {
             String auth = (String) deserialize(req.headers("authorization"), String.class);
-            ArrayList<GameData> games = new ArrayList<>(gameserve.ListGames(auth));
+            ArrayList<GameData> games = new ArrayList<>(gameserve.listGames(auth));
             res.body(serialize(games));
             res.status(200);
             response.success=true;
@@ -44,7 +44,7 @@ public class GameHandler extends Handler {
         try {
             String auth = (String) deserialize(req.headers("authorization"), String.class);
             CreateGameData data = (CreateGameData) deserialize(req.body(), CreateGameData.class);
-            int gameID = gameserve.CreateGame(auth, data.gameName());
+            int gameID = gameserve.createGame(auth, data.gameName());
             GameIDData gameIDdata = new GameIDData(gameID);
             res.body(serialize(gameIDdata));
             res.status(200);
@@ -61,7 +61,7 @@ public class GameHandler extends Handler {
         try {
             String auth = (String) deserialize(req.headers("authorization"), String.class);
             JoinGameData data = (JoinGameData) deserialize(req.body(), JoinGameData.class);
-            gameserve.JoinGame(auth, data.playerColor(), data.gameID());
+            gameserve.joinGame(auth, data.playerColor(), data.gameID());
             res.status(200);
             response.success = true;
             response.gameID = data.gameID();

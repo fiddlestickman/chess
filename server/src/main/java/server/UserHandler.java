@@ -24,7 +24,7 @@ public class UserHandler extends Handler {
         try {
             String json = req.body();
             LoginData data = (LoginData) deserialize(json, LoginData.class);
-            String authToken = userserve.Login(data.username(), data.password());
+            String authToken = userserve.login(data.username(), data.password());
             res.status(200);
             res.body(serialize(authToken));
             response.success=true;
@@ -41,7 +41,7 @@ public class UserHandler extends Handler {
         Response response = new Response();
         try {
             String auth = (String) deserialize(req.headers("authorization"), String.class);
-            userserve.Logout(auth);
+            userserve.logout(auth);
             res.status(200);
             response.success = true;
             return serialize(response);
@@ -56,7 +56,7 @@ public class UserHandler extends Handler {
         try {
             String body = req.body();
             UserData data = (UserData) deserialize(body, UserData.class);
-            String auth = userserve.Register(data.username(), data.password(), data.email());
+            String auth = userserve.register(data.username(), data.password(), data.email());
             String authToken = serialize(auth);
             res.body(authToken);
             res.status(200);
