@@ -15,11 +15,6 @@ public class MemoryAuthDAO extends MemoryDAO<AuthData> implements AuthDAO {
         }
         return instance;
     }
-
-    public AuthData readUser(String username) {
-        AuthData temp = new AuthData("", username);
-        return super.read(temp, "username");
-    }
     public AuthData readAuth(String authToken) throws DataAccessException {
         AuthData temp = new AuthData(authToken, "");
         return super.read(temp, "authToken");
