@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
-import dataAccess.MemoryAuthDAO;
+import dataAccess.SQLAuthDAO;
 import model.AuthData;
 
 class Service {
@@ -23,7 +23,7 @@ class Service {
      * Authenticates an authToken, and throws an error if none match
      */
     public AuthData authenticate(String authToken) throws DataAccessException, ServiceException{
-        AuthDAO authDAO = MemoryAuthDAO.getInstance();
+        AuthDAO authDAO = SQLAuthDAO.getInstance();
         AuthData auth;
         auth = authDAO.readAuth(authToken);
         if (auth == null)

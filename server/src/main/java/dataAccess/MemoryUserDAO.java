@@ -16,12 +16,12 @@ public class MemoryUserDAO extends MemoryDAO<UserData> implements UserDAO {
         return instance;
     }
 
-    public UserData readUserName(String username) {
+    public UserData readUserName(String username, String password) {
         UserData temp = new UserData(username, "", "");
         return super.read(temp, "username");
     }
 
-    public UserData readUserEmail(String email) {
+    public UserData readUserEmail(String email, String password) {
         UserData temp = new UserData("", "", email);
         return super.read(temp, "email");
     }

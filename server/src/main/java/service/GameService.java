@@ -13,13 +13,13 @@ public class GameService extends Service {
         authenticate(authToken);
         if (gameName == null)
             throw new ServiceException("bad request", 400);
-        GameDAO gameDAO = MemoryGameDAO.getInstance();
+        GameDAO gameDAO = SQLGameDAO.getInstance();
         GameData game = new GameData(0, null, null, gameName, new ChessGame());
         //the GameDAO handles gameID creation
         return gameDAO.create(game);
     }
     public void joinGame(String authToken, ChessGame.TeamColor teamColor, int gameID) throws DataAccessException, ServiceException {
-        GameDAO gameDAO = MemoryGameDAO.getInstance();
+        GameDAO gameDAO = SQLGameDAO.getInstance();
         AuthData auth = authenticate(authToken);
         if (gameDAO.readGameID(gameID) == null)
             throw new ServiceException("bad request", 400);
@@ -40,7 +40,7 @@ public class GameService extends Service {
         }
     }
     public Collection<GameData> listGames(String authToken) throws DataAccessException , ServiceException {
-        GameDAO gameDAO = MemoryGameDAO.getInstance();
+        GameDAO gameDAO = SQLGameDAO.getInstance();
 
         return gameDAO.readAll();
     }

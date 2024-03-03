@@ -26,14 +26,16 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         var id = executeUpdate(statement, u.username(), password, u.email());
         return id;
     }
-    public UserData readUserName(String username) throws DataAccessException {
+    public UserData readUserName(String username, String password) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT username, password, email FROM user WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readUser(rs);
+                        if (verifyUser(username, password)) {
+                            return readUser(rs, password);
+                        }
                     }
                 }
             }
@@ -59,14 +61,14 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         return null;
     }
 
-    public UserData readUserEmail(String email) throws DataAccessException {
+    public UserData readUserEmail(String email, String password) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT username, password, email FROM user WHERE email=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, email);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readUser(rs);
+                        return readUser(rs, password);
                     }
                 }
             }
@@ -85,11 +87,10 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         return encoder.encode(password);
     }
 
-    boolean verifyUser(String username, String providedClearTextPassword) {
+    private boolean verifyUser(String username, String providedClearTextPassword) {
         // read the previously hashed password from the database
         try {
             var hashedPassword = readPassword(username);
-
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             return encoder.matches(providedClearTextPassword, hashedPassword);
         } catch (Exception e) {
@@ -97,9 +98,8 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         }
     }
 
-    private UserData readUser(ResultSet rs) throws SQLException {
+    private UserData readUser(ResultSet rs, String password) throws SQLException {
         var username = rs.getString("username");
-        var password = rs.getString("password");
         var email = rs.getString("email");
         return new UserData(username, password, email);
     }
