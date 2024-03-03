@@ -8,7 +8,6 @@ import java.sql.SQLException;
 
 public class SQLAuthDAO extends SQLDAO implements AuthDAO {
     private static SQLAuthDAO instance;
-    private boolean databaseExists;
 
     private SQLAuthDAO() throws DataAccessException {
         DatabaseManager.createDatabase();

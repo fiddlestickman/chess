@@ -7,6 +7,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLUserDAO extends SQLDAO implements UserDAO {
+
+    private static SQLUserDAO instance;
+
+    private SQLUserDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
+    }
+
+    public static SQLUserDAO getInstance() throws DataAccessException {
+        if (instance == null) {
+            instance = new SQLUserDAO();
+        }
+        return instance;
+    }
     public int create(UserData u) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         var password = hashPass(u.password());

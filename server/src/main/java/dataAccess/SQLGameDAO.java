@@ -10,6 +10,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert chessgame objects to json strings
+
+    private static SQLGameDAO instance;
+
+    private SQLGameDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
+    }
+
+    public static SQLGameDAO getInstance() throws DataAccessException {
+        if (instance == null) {
+            instance = new SQLGameDAO();
+        }
+        return instance;
+    }
+
+
     public int create(GameData g) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUser, blackUser, gameName, chessGame) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(g.game());
