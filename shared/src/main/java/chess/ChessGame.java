@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -487,5 +489,9 @@ public class ChessGame {
     @Override
     public int hashCode() {
         return Objects.hash(currentPlayer, board, lastMove, lastMoveCaptured);
+    }
+
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

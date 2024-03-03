@@ -125,6 +125,7 @@ public class DatabaseManager {
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
+
     }
 
 }
