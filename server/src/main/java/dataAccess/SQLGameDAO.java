@@ -48,18 +48,19 @@ public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert c
         }
         return null;
     }
-    public void update(GameData g) throws DataAccessException {try (var conn = DatabaseManager.getConnection()) {
-        var statement = "UPDATE game SET whiteUser=?, blackUser=?, chessGame=? WHERE gameID=?";
-        try (var ps = conn.prepareStatement(statement)) {
-            ps.setString(1, g.whiteUsername());
-            ps.setString(2, g.blackUsername());
-            ps.setString(3, g.game().toString());
-            ps.setInt(4, g.gameID());
-            ps.executeQuery();
+    public void update(GameData g) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE game SET whiteUser=?, blackUser=?, chessGame=? WHERE gameID=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, g.whiteUsername());
+                ps.setString(2, g.blackUsername());
+                ps.setString(3, g.game().toString());
+                ps.setInt(4, g.gameID());
+                ps.executeQuery();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-    } catch (Exception e) {
-        throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-    }
     }
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE game";

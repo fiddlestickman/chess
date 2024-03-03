@@ -3,34 +3,92 @@ package dataAccess;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class SQLUserDAO implements UserDAO {
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class SQLUserDAO extends SQLDAO implements UserDAO {
     public int create(UserData u) throws DataAccessException {
-        return 0;
+        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+        var password = hashPass(u.password());
+        var id = executeUpdate(statement, u.username(), password, u.email());
+        return id;
     }
     public UserData readUserName(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
+    private String readPassword(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT password FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("password");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     public UserData readUserEmail(String email) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user WHERE email=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, email);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
     public void clear() throws DataAccessException {
-
+        var statement = "TRUNCATE game";
+        executeUpdate(statement);
     }
 
-    void storeUserPassword(String username, String password) {
+    private String hashPass(String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(clearTextPassword);
-
-        // write the hashed password in database along with the user's other information
-        writeHashedPasswordToDatabase(username, hashedPassword);
+        return encoder.encode(password);
     }
 
     boolean verifyUser(String username, String providedClearTextPassword) {
         // read the previously hashed password from the database
-        var hashedPassword = readHashedPasswordFromDatabase(username);
+        try {
+            var hashedPassword = readPassword(username);
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(providedClearTextPassword, hashedPassword);
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            return encoder.matches(providedClearTextPassword, hashedPassword);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var password = rs.getString("password");
+        var email = rs.getString("email");
+        return new UserData(username, password, email);
     }
 
 }
