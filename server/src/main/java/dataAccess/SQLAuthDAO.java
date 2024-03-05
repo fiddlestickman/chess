@@ -10,7 +10,8 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
     private static SQLAuthDAO instance;
 
     private SQLAuthDAO() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        DatabaseManager data = new DatabaseManager();
+        data.configureDatabase();
     }
 
     public static SQLAuthDAO getInstance() throws DataAccessException {

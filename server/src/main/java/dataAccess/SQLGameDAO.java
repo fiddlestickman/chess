@@ -14,7 +14,8 @@ public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert c
     private static SQLGameDAO instance;
 
     private SQLGameDAO() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        DatabaseManager data = new DatabaseManager();
+        data.configureDatabase();
     }
 
     public static SQLGameDAO getInstance() throws DataAccessException {

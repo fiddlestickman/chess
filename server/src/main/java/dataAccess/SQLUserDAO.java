@@ -11,7 +11,8 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
     private static SQLUserDAO instance;
 
     private SQLUserDAO() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        DatabaseManager data = new DatabaseManager();
+        data.configureDatabase();
     }
 
     public static SQLUserDAO getInstance() throws DataAccessException {
