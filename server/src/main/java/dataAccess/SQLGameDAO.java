@@ -71,7 +71,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert c
                 ps.setString(2, g.blackUsername());
                 ps.setString(3, g.game().toString());
                 ps.setInt(4, g.gameID());
-                ps.executeQuery();
+                ps.executeUpdate();
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
@@ -87,7 +87,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert c
         var whiteUser = rs.getString("whiteUser");
         var blackUser = rs.getString("blackUser");
         var gameName = rs.getString("gameName");
-        var json = rs.getString("game");
+        var json = rs.getString("chessGame");
         var game = new Gson().fromJson(json, ChessGame.class);
 
         return new GameData(gameID, whiteUser, blackUser, gameName, game);
