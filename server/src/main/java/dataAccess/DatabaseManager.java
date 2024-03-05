@@ -95,7 +95,7 @@ public class DatabaseManager {
               `whiteUser` varchar(256),
               `blackUser` varchar(256),
               `gameName` varchar(256) NOT NULL,
-              `chessGame` varchar(256) NOT NULL,
+              `chessGame` varchar(4096) NOT NULL,
               PRIMARY KEY (`gameID`),
               FOREIGN KEY (`whiteUser`) references user(username),
               FOREIGN KEY (`blackUser`) references user(username),

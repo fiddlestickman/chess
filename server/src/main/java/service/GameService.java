@@ -41,6 +41,7 @@ public class GameService extends Service {
     }
     public Collection<GameData> listGames(String authToken) throws DataAccessException , ServiceException {
         GameDAO gameDAO = SQLGameDAO.getInstance();
+        AuthData auth = authenticate(authToken);
 
         return gameDAO.readAll();
     }
