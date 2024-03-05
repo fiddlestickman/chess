@@ -65,6 +65,11 @@ public class SQLGameDAO extends SQLDAO implements GameDAO { //needs to convert c
         return null;
     }
     public void update(GameData g) throws DataAccessException {
+        GameData in = readGameID(g.gameID());
+        if (in == null) {
+            throw new DataAccessException("game does not exist");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "UPDATE game SET whiteUser=?, blackUser=?, chessGame=? WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
