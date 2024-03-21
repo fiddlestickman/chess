@@ -1,5 +1,8 @@
+import model.CreateGameData;
+import model.GameData;
 import model.LoginData;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -20,13 +23,16 @@ public class PregameMenu {
             System.out.printf("%d. %s - Explains the different options available%n", 1, pregameOptions[0]);
             System.out.printf("%d. %s - Creates a new chess game, without players selected%n", 2, pregameOptions[1]);
             System.out.printf("%d. %s - Lists all the games created%n", 3, pregameOptions[2]);
-            System.out.printf("%d. %s - Joins an existing chess game as one of the players%n%n", 4, pregameOptions[3]);
-            System.out.printf("%d. %s - Joins an existing chess game as a spectator%n%n", 5, pregameOptions[4]);
+            System.out.printf("%d. %s - Joins an existing chess game as one of the players%n", 4, pregameOptions[3]);
+            System.out.printf("%d. %s - Joins an existing chess game as a spectator%n", 5, pregameOptions[4]);
             System.out.printf("%d. %s - Logs out of your account, returning to the start menu%n%n", 6, pregameOptions[5]);
             return "keep looping";
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "create game")) {
-
+            String name = getString("Please enter a game name: ");
+            int gameID = createGame(name);
+            System.out.printf("Created a game called '%s' with ID %d.%n", name, gameID);
+            return "keep looping";
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "list games")) {
 
@@ -47,15 +53,26 @@ public class PregameMenu {
         return "don't worry about it";
     }
 
-    private void createGame(String name){
-
-        HTTPHandler handler = new HTTPHandler(url);
-        LoginData data = new LoginData(name, name);
+    private int createGame(String name){
+        HTTPHandler handler = new HTTPHandler(auth, url + "/game");
+        CreateGameData data = new CreateGameData(name);
         handler.serialize(data);
         try {
-            String auth = (String) handler.Request("GET", data, String.class);
+            Main.CreateResponse game = (Main.CreateResponse) handler.Request("POST", data, Main.CreateResponse.class);
+            return game.gameID;
         } catch (Exception e) {
-            //error handling
+            return -1;
+        }
+    }
+
+    private ArrayList<GameData> listGames() {
+        HTTPHandler handler = new HTTPHandler(auth, url + "/game");
+
+        try {
+            Main.ListResponse games = (Main.ListResponse) handler.Request("GET", null, Main.ListResponse.class);
+            return games.games;
+        } catch (Exception e) {
+            return null;
         }
     }
 

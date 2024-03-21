@@ -62,7 +62,7 @@ public class LoginMenu {
     }
 
     private String Login(String username, String password) {
-        HTTPHandler handler = new HTTPHandler(url + "/session");
+        HTTPHandler handler = new HTTPHandler(null, url + "/session");
         LoginData data = new LoginData(username, password);
         handler.serialize(data);
         try {
@@ -75,7 +75,7 @@ public class LoginMenu {
     }
 
     private String Register(String username, String password, String email) {
-        HTTPHandler handler = new HTTPHandler(url + "/user");
+        HTTPHandler handler = new HTTPHandler(null, url + "/user");
         UserData data = new UserData(username, password, email);
         handler.serialize(data);
         try {

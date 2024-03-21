@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -32,7 +33,7 @@ public class Main {
             System.out.println(new Gson().fromJson(inputStreamReader, Map.class));
         }
         */
-        HTTPHandler handler = new HTTPHandler(serverUrl + "/hello");
+        HTTPHandler handler = new HTTPHandler(null, serverUrl + "/hello");
         Object temp;
         try {
             temp = handler.Request("GET", null, Response.class);
@@ -45,8 +46,8 @@ public class Main {
         boolean loop = true;
         while (loop) {
             String out = login.LoginLoop();
-            if (out == "keep looping") {} //do nothing, keep looping
-            else if (out == "stop looping") {
+            if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
+            else if (Objects.equals(out, "stop looping")) {
                 loop = false;
             }
             else {
@@ -59,13 +60,22 @@ public class Main {
             return; //escaped the loop without an authtoken
         }
 
-        PregameMenu pregame = new PregameMenu(serverUrl, auth);
+        PregameMenu pregame = new PregameMenu(auth, serverUrl);
         loop = true;
 
         while (loop) {
-            String out =
+            String out = pregame.PregameLoop();
+            if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
+            else if (Objects.equals(out, "stop looping")) {
+                loop = false;
+            }
+            else {
+                loop = false;
+                auth = out;
+            }
         }
 
+        String temp2 = "hey";
         //connect to the server
         //look for the options (help quit login register)
         //if help, give options

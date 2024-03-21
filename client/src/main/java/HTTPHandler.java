@@ -6,8 +6,10 @@ import java.io.*;
 import java.net.*;
 
 public class HTTPHandler {
-    String url;
-    public HTTPHandler(String url) {
+    private String auth;
+    private String url;
+    public HTTPHandler(String auth, String url) {
+        this.auth = auth;
         this.url = url;
     }
 
@@ -24,10 +26,13 @@ public class HTTPHandler {
         return deserialize((String) map, expected);
     }
 
-    private static HttpURLConnection sendRequest(String url, String method, String body) throws URISyntaxException, IOException {
+    private HttpURLConnection sendRequest(String url, String method, String body) throws URISyntaxException, IOException {
         URI uri = new URI(url);
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
+        if (auth != null && !auth.isBlank()) {
+            http.setRequestProperty("authorization", auth);
+        }
         writeRequestBody(body, http);
         http.connect();
         return http;
