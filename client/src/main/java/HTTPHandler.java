@@ -4,7 +4,6 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.*;
 import java.net.*;
-import java.util.Map;
 
 public class HTTPHandler {
     String url;

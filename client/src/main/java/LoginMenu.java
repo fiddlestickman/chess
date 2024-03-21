@@ -47,8 +47,7 @@ public class LoginMenu {
             String password = getString("Password: ");
             String password2 = getString("Reenter Password: ");
             if (password.equals(password2)) {
-                Register(username, password, email);
-                return Login(username, password);
+                return Register(username, password, email);
             } else {
                 System.out.print("Password doesn't match, please try again");
                 return "keep looping";
@@ -68,22 +67,24 @@ public class LoginMenu {
         LoginData data = new LoginData(username, password);
         handler.serialize(data);
         try {
-            String auth = (String) handler.Request("GET", data, String.class);
-            return auth;
+            Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
+            return auth.authToken;
         } catch (Exception e) {
             //error handling
         }
         return null;
     }
 
-    private void Register(String username, String password, String email) {
+    private String Register(String username, String password, String email) {
         HTTPHandler handler = new HTTPHandler(url + "/user");
         UserData data = new UserData(username, password, email);
         handler.serialize(data);
         try {
-            handler.Request("POST", data, String.class);
+            Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
+            return auth.authToken;
         } catch (Exception e) {
-            //error handling
+            System.out.print(e.getMessage());
+            return null;
         }
     }
 
