@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class LoginMenu {
 
     private static String[] loginOptions = {"Help", "Login", "Register", "Quit"};
-    private static String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
     private String url;
 
     public LoginMenu(String url) {
@@ -63,7 +62,7 @@ public class LoginMenu {
     }
 
     private String Login(String username, String password) {
-        HTTPHandler handler = new HTTPHandler(url);
+        HTTPHandler handler = new HTTPHandler(url + "/session");
         LoginData data = new LoginData(username, password);
         handler.serialize(data);
         try {
