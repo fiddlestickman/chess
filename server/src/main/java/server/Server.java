@@ -14,11 +14,10 @@ public class Server {
 
         Spark.awaitInitialization();
         return Spark.port();
-
     }
 
 private static void createRoutes() {
-    Spark.get("/hello", (req, res) -> "Greetings and good day!");
+    Spark.get("/hello", (req, res) -> AdminHandler.getInstance().greetRequest(req, res));
     Spark.delete("/db", (req, res) -> AdminHandler.getInstance().clearRequest(req, res));
     Spark.post("/user", (req, res) -> UserHandler.getInstance().registerRequest(req, res));
     Spark.post("/session", (req, res) -> UserHandler.getInstance().loginRequest(req, res));

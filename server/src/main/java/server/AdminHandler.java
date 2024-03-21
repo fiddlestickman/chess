@@ -29,4 +29,14 @@ public class AdminHandler extends Handler {
         } catch (DataAccessException e) { return error(e, res, 500);
         }
     }
+
+    public Object greetRequest(spark.Request req, spark.Response res) {
+        Response response = new Response();
+        res.status(200);
+        response.success = true;
+        response.message = "Greetings and good day!";
+        //res.body(serialize(response));
+        return serialize(response);
+    }
+
 }

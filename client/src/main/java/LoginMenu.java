@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import model.LoginData;
+import model.UserData;
 
 import java.util.Objects;
 import java.util.Scanner;
@@ -16,12 +17,10 @@ public class LoginMenu {
         this.url = url;
     }
 
-    public void LoginLoop() {
+    public String LoginLoop() {
         //do the login stuff
         //eventually calls PregameLoop if logged in
         //make sure to program in error handling (not typing numbers, for instance)
-
-        boolean loop = true;
 
         System.out.print("[Logged out]>>> ");
         Scanner scanner = new Scanner(System.in);
@@ -31,67 +30,69 @@ public class LoginMenu {
         String input = numbers[0].strip();
         input = input.toLowerCase();
         if (Objects.equals(input, "1") || Objects.equals(input, "help")) {
-            System.out.printf("%d. %s - Explains the different options available%n", 1, loginOptions[1]);
-            System.out.printf("%d. %s - Asks for an existing username and password, then grants access to the rest of the program%n", 2, loginOptions[2]);
-            System.out.printf("%d. %s - Asks for a new username, password, and email, then automatically logs you in%n", 3, loginOptions[3]);
-            System.out.printf("%d. %s - Exits the program%n%n", 4, loginOptions[4]);
+            System.out.printf("%d. %s - Explains the different options available%n", 1, loginOptions[0]);
+            System.out.printf("%d. %s - Asks for an existing username and password, then grants access to the rest of the program%n", 2, loginOptions[1]);
+            System.out.printf("%d. %s - Asks for a new username, password, and email, then automatically logs you in%n", 3, loginOptions[2]);
+            System.out.printf("%d. %s - Exits the program%n%n", 4, loginOptions[3]);
+            return "keep looping";
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "login")) {
-            System.out.print("Username: ");
-            Scanner login = new Scanner(System.in);
-            line = login.nextLine();
-            String username = line.strip();
-
-            System.out.print("Password: ");
-            login = new Scanner(System.in);
-            line = login.nextLine();
-            String password = line.strip();
-
-
+            String username = getString("Username: ");
+            String password = getString("Password: ");
+            return Login(username, password);
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "register")) {
-            //register
+            String username = getString("Username: ");
+            String email = getString("Email: ");
+            String password = getString("Password: ");
+            String password2 = getString("Reenter Password: ");
+            if (password.equals(password2)) {
+                Register(username, password, email);
+                return Login(username, password);
+            } else {
+                System.out.print("Password doesn't match, please try again");
+                return "keep looping";
+            }
         }
         else if (Objects.equals(input, "4") || Objects.equals(input, "quit")) {
-            //quit
+            return "stop looping";
         }
         else {
             System.out.print("Input not understood. Try entering \"Help\" to view options.\n");
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine();
-        var numbers = line.split(" ");
-
-        int result = 0;
-        for (var number : numbers) {
-            result += Integer.parseInt(number);
-        }
-        var equation = String.join(" + ", numbers);
-        System.out.printf("%s = %d%n", equation, result);
-
-
-        if (loop) {
-            LoginLoop();
+            return "keep looping";
         }
     }
 
-    private void Login(String username, String password) {
+    private String Login(String username, String password) {
         HTTPHandler handler = new HTTPHandler(url);
         LoginData data = new LoginData(username, password);
         handler.serialize(data);
         try {
-            handler.Request("GET", data, String.class);
+            String auth = (String) handler.Request("GET", data, String.class);
+            return auth;
+        } catch (Exception e) {
+            //error handling
+        }
+        return null;
+    }
+
+    private void Register(String username, String password, String email) {
+        HTTPHandler handler = new HTTPHandler(url + "/user");
+        UserData data = new UserData(username, password, email);
+        handler.serialize(data);
+        try {
+            handler.Request("POST", data, String.class);
         } catch (Exception e) {
             //error handling
         }
     }
 
-
-
-    public static void PregameLoop() {
-        //do the pregame stuff
-        //lets you join games
+    private String getString(String prompt) {
+        System.out.print(prompt);
+        Scanner login = new Scanner(System.in);
+        String line = login.nextLine();
+        return line.strip();
     }
+
 
 }

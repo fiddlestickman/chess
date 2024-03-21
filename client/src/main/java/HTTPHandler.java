@@ -13,8 +13,13 @@ public class HTTPHandler {
     }
 
     public Object Request(String method, Object obj, Class<?> expected) throws Exception {
-
-        String body = serialize(obj);
+        String body;
+        if (obj == null) {
+            body = "";
+        }
+        else {
+            body = serialize(obj);
+        }
         HttpURLConnection http = sendRequest(url, method, body);
         Object map = receiveResponse(http);
         return deserialize((String) map, expected);
@@ -48,12 +53,15 @@ public class HTTPHandler {
     }
 
     private static Object readResponseBody(HttpURLConnection http) throws IOException {
-        Object responseBody = "";
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+        StringBuilder result = new StringBuilder();
+        http.getInputStream();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(http.getInputStream()))) {
+            for (String line; (line = reader.readLine()) != null; ) {
+                result.append(line);
+            }
         }
-        return responseBody;
+        return result.toString();
     }
 
     public Object deserialize (String body, Class<?> classType) throws RequestException {
@@ -63,9 +71,13 @@ public class HTTPHandler {
         try {
             return gson.fromJson(body, classType);
         } catch (JsonSyntaxException e) {
-            if (classType == String.class)
-                throw new RequestException("unauthorized", 401);
-            throw new RequestException("bad request", 400);
+            try {
+                return gson.fromJson(body, Main.Response.class);
+            } catch (JsonSyntaxException f) {
+                if (classType == String.class)
+                    throw new RequestException("unauthorized", 401);
+                throw new RequestException("bad request", 400);
+            }
         }
     }
 
