@@ -55,10 +55,15 @@ public class Main {
             }
         }
 
+        if (auth == null) {
+            return; //escaped the loop without an authtoken
+        }
+
+        PregameMenu pregame = new PregameMenu(serverUrl, auth);
         loop = true;
 
         while (loop) {
-
+            String out =
         }
 
         //connect to the server
