@@ -115,7 +115,11 @@ public class PregameMenu {
         handler.serialize(data);
         try {
             Main.CreateResponse game = (Main.CreateResponse) handler.Request("POST", data, Main.CreateResponse.class);
-            return game.gameID;
+            if (game.success) {
+                return game.gameID;
+            } else {
+                throw new RequestException(game.message, 500);
+            }
         } catch (Exception e) {
             return -1;
         }
@@ -125,7 +129,11 @@ public class PregameMenu {
         HTTPHandler handler = new HTTPHandler(auth, url + "/game");
         try {
             Main.ListResponse games = (Main.ListResponse) handler.Request("GET", null, Main.ListResponse.class);
-            return games.games;
+            if (games.success) {
+                return games.games;
+            } else {
+                throw new RequestException(games.message, 500);
+            }
         } catch (Exception e) {
             return null;
         }
@@ -137,7 +145,11 @@ public class PregameMenu {
         handler.serialize(data);
         try {
             Main.JoinResponse response = (Main.JoinResponse) handler.Request("PUT", data, Main.JoinResponse.class);
-            return response;
+            if (response.success) {
+                return response;
+            } else {
+                throw new RequestException(response.message, 500);
+            }
         } catch (Exception e) {
             return null;
         }
@@ -147,6 +159,9 @@ public class PregameMenu {
         HTTPHandler handler = new HTTPHandler(auth, url + "/session");
         try {
             Main.Response response = (Main.Response) handler.Request("DELETE", null, Main.Response.class);
+            if (!response.success) {
+                throw new RequestException(response.message, 500);
+            }
         } catch (Exception e) {
             //error handling
         }

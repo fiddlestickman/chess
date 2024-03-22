@@ -1,6 +1,3 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import model.LoginData;
 import model.UserData;
 
@@ -67,7 +64,11 @@ public class LoginMenu {
         handler.serialize(data);
         try {
             Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
-            return auth.authToken;
+            if (auth.success) {
+                return auth.authToken;
+            } else {
+                throw new RequestException(auth.message, 500);
+            }
         } catch (Exception e) {
             //error handling
         }
@@ -80,7 +81,11 @@ public class LoginMenu {
         handler.serialize(data);
         try {
             Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
-            return auth.authToken;
+            if (auth.success) {
+                return auth.authToken;
+            } else {
+                throw new RequestException(auth.message, 500);
+            }
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return null;
