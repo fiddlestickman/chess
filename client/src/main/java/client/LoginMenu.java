@@ -1,3 +1,5 @@
+package client;
+
 import model.LoginData;
 import model.UserData;
 
@@ -7,14 +9,14 @@ import java.util.Scanner;
 public class LoginMenu {
 
     private static String[] loginOptions = {"Help", "Login", "Register", "Quit"};
-    private String url;
+    private ServerFacade facade;
+
 
     public LoginMenu(String url) {
-        this.url = url;
+        facade = new ServerFacade(url, null);
     }
 
     public String LoginLoop() {
-        //do the login stuff
 
         System.out.print("[Logged out]>>> ");
         Scanner scanner = new Scanner(System.in);
@@ -33,7 +35,7 @@ public class LoginMenu {
         else if (Objects.equals(input, "2") || Objects.equals(input, "login")) {
             String username = getString("Username: ");
             String password = getString("Password: ");
-            return Login(username, password);
+            return facade.Login(username, password);
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "register")) {
             String username = getString("Username: ");
@@ -41,7 +43,7 @@ public class LoginMenu {
             String password = getString("Password: ");
             String password2 = getString("Reenter Password: ");
             if (password.equals(password2)) {
-                return Register(username, password, email);
+                return facade.Register(username, password, email);
             } else {
                 System.out.print("Password doesn't match, please try again");
                 return "keep looping";
@@ -53,40 +55,6 @@ public class LoginMenu {
         else {
             System.out.print("Input not understood. Try entering \"Help\" to view options.\n");
             return "keep looping";
-        }
-    }
-
-    private String Login(String username, String password) {
-        HTTPHandler handler = new HTTPHandler(null, url + "/session");
-        LoginData data = new LoginData(username, password);
-        handler.serialize(data);
-        try {
-            Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
-            if (auth.success) {
-                return auth.authToken;
-            } else {
-                throw new RequestException(auth.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            return null;
-        }
-    }
-
-    private String Register(String username, String password, String email) {
-        HTTPHandler handler = new HTTPHandler(null, url + "/user");
-        UserData data = new UserData(username, password, email);
-        handler.serialize(data);
-        try {
-            Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
-            if (auth.success) {
-                return auth.authToken;
-            } else {
-                throw new RequestException(auth.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            return null;
         }
     }
 

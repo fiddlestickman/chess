@@ -1,8 +1,9 @@
+package client;
+
 import chess.ChessGame;
 import model.CreateGameData;
 import model.GameData;
 import model.JoinGameData;
-import model.LoginData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,12 +14,10 @@ import static ui.ChessboardUI.Print;
 
 public class PregameMenu {
     private static String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
-    private String url;
-    private String auth;
+    private ServerFacade facade;
 
     public PregameMenu(String auth, String url) {
-        this.auth = auth;
-        this.url = url;
+        facade = new ServerFacade(url, auth);
     }
 
     public String PregameLoop() {
@@ -35,12 +34,12 @@ public class PregameMenu {
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "create game")) {
             String name = getString("Please enter a game name: ");
-            int gameID = createGame(name);
+            int gameID = facade.createGame(name);
             System.out.printf("Created a game called '%s' with ID %d.%n", name, gameID);
             return "keep looping";
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "list games")) {
-            ArrayList<GameData> games = listGames();
+            ArrayList<GameData> games = facade.listGames();
             if (games != null) {
                 Iterator<GameData> gameiter = games.iterator();
                 System.out.print("ID - Game Name - White Username - Black Username\n");
@@ -77,7 +76,7 @@ public class PregameMenu {
                 return "keep looping";
             }
             int gameID = Integer.parseInt(id);
-            Main.JoinResponse out = joinGame(gameID, color);
+            Main.JoinResponse out = facade.joinGame(gameID, color);
             if (out != null && out.playerColor != null) {
                 System.out.printf("Joined game on the %s team.%n", out.playerColor);
                 Print(null);
@@ -89,7 +88,7 @@ public class PregameMenu {
         else if (Objects.equals(input, "5") || Objects.equals(input, "join observer")) {
             String id = getString("Please enter a game ID: ");
             int gameID = Integer.parseInt(id);
-            Main.JoinResponse out = joinGame(gameID, null);
+            Main.JoinResponse out = facade.joinGame(gameID, null);
             if (out != null){
                 System.out.print("Joined game as an observer\n");
                 Print(null);
@@ -100,73 +99,12 @@ public class PregameMenu {
         }
         else if (Objects.equals(input, "6") || Objects.equals(input, "logout")) {
             System.out.print("Logging out...\n");
-            logout();
+            facade.logout();
             return "stop looping";
         }
         else {
             System.out.print("Input not understood. Try entering \"Help\" to view options.\n");
             return "keep looping";
-        }
-    }
-
-    private int createGame(String name){
-        HTTPHandler handler = new HTTPHandler(auth, url + "/game");
-        CreateGameData data = new CreateGameData(name);
-        handler.serialize(data);
-        try {
-            Main.CreateResponse game = (Main.CreateResponse) handler.Request("POST", data, Main.CreateResponse.class);
-            if (game.success) {
-                return game.gameID;
-            } else {
-                throw new RequestException(game.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            return -1;
-        }
-    }
-
-    private ArrayList<GameData> listGames() {
-        HTTPHandler handler = new HTTPHandler(auth, url + "/game");
-        try {
-            Main.ListResponse games = (Main.ListResponse) handler.Request("GET", null, Main.ListResponse.class);
-            if (games.success) {
-                return games.games;
-            } else {
-                throw new RequestException(games.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            return null;
-        }
-    }
-
-    private Main.JoinResponse joinGame(int gameID, ChessGame.TeamColor color) {
-        HTTPHandler handler = new HTTPHandler(auth, url + "/game");
-        JoinGameData data = new JoinGameData(color, gameID);
-        handler.serialize(data);
-        try {
-            Main.JoinResponse response = (Main.JoinResponse) handler.Request("PUT", data, Main.JoinResponse.class);
-            if (response.success) {
-                return response;
-            } else {
-                throw new RequestException(response.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            return null;
-        }
-    }
-
-    private void logout(){
-        HTTPHandler handler = new HTTPHandler(auth, url + "/session");
-        try {
-            Main.Response response = (Main.Response) handler.Request("DELETE", null, Main.Response.class);
-            if (!response.success) {
-                throw new RequestException(response.message, 500);
-            }
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
         }
     }
 
