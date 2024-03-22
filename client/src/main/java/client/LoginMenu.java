@@ -1,8 +1,5 @@
 package client;
 
-import model.LoginData;
-import model.UserData;
-
 import java.util.Objects;
 import java.util.Scanner;
 

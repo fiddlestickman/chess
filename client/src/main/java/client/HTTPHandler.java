@@ -50,15 +50,6 @@ public class HTTPHandler {
     }
 
     private static Object receiveResponse(HttpURLConnection http) throws IOException {
-        var statusCode = http.getResponseCode();
-        var statusMessage = http.getResponseMessage();
-
-        Object responseBody = readResponseBody(http);
-        System.out.printf("= Response =========\n[%d] %s\n\n", statusCode, statusMessage);
-        return responseBody;
-    }
-
-    private static Object readResponseBody(HttpURLConnection http) throws IOException {
         StringBuilder result = new StringBuilder();
         http.getInputStream();
         try (BufferedReader reader = new BufferedReader(

@@ -1,9 +1,7 @@
 package client;
 
 import chess.ChessGame;
-import model.CreateGameData;
 import model.GameData;
-import model.JoinGameData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
