@@ -121,6 +121,7 @@ public class PregameMenu {
                 throw new RequestException(game.message, 500);
             }
         } catch (Exception e) {
+            System.out.print(e.getMessage());
             return -1;
         }
     }
@@ -135,6 +136,7 @@ public class PregameMenu {
                 throw new RequestException(games.message, 500);
             }
         } catch (Exception e) {
+            System.out.print(e.getMessage());
             return null;
         }
     }
@@ -151,6 +153,7 @@ public class PregameMenu {
                 throw new RequestException(response.message, 500);
             }
         } catch (Exception e) {
+            System.out.print(e.getMessage());
             return null;
         }
     }
@@ -163,7 +166,7 @@ public class PregameMenu {
                 throw new RequestException(response.message, 500);
             }
         } catch (Exception e) {
-            //error handling
+            System.out.print(e.getMessage());
         }
     }
 

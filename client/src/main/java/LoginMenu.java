@@ -15,8 +15,6 @@ public class LoginMenu {
 
     public String LoginLoop() {
         //do the login stuff
-        //eventually calls PregameLoop if logged in
-        //make sure to program in error handling (not typing numbers, for instance)
 
         System.out.print("[Logged out]>>> ");
         Scanner scanner = new Scanner(System.in);
@@ -70,9 +68,9 @@ public class LoginMenu {
                 throw new RequestException(auth.message, 500);
             }
         } catch (Exception e) {
-            //error handling
+            System.out.print(e.getMessage());
+            return null;
         }
-        return null;
     }
 
     private String Register(String username, String password, String email) {
