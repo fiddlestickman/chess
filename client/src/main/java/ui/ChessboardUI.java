@@ -18,7 +18,7 @@ public class ChessboardUI {
     private static String[] blackrows = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
 
-    public static void main(String[] args) {
+    public static void Print(String[] args) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -33,7 +33,7 @@ public class ChessboardUI {
         drawChessboard(out, true, board);
         drawHeaders(out, true);
 
-        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
     }
 

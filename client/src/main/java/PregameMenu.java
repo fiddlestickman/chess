@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static ui.ChessboardUI.Print;
+
 public class PregameMenu {
     private static String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
     private String url;
@@ -78,8 +80,7 @@ public class PregameMenu {
             Main.JoinResponse out = joinGame(gameID, color);
             if (out != null && out.playerColor != null) {
                 System.out.printf("Joined game on the %s team.%n", out.playerColor);
-            } else if (out != null){
-                System.out.print("Joined game as an observer\n");
+                Print(null);
             } else {
                 //error handling
             }
@@ -91,6 +92,7 @@ public class PregameMenu {
             Main.JoinResponse out = joinGame(gameID, null);
             if (out != null){
                 System.out.print("Joined game as an observer\n");
+                Print(null);
             } else {
                 //error handling
             }
