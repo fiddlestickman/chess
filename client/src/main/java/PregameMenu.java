@@ -54,20 +54,26 @@ public class PregameMenu {
                     }
                     System.out.printf("%d - %s - %s - %s%n", next.gameID(), next.gameName(), white, black);
                 }
+                return "keep looping";
             }
             else {
                 System.out.print("No games found");
+                return "keep looping";
             }
 
         }
         else if (Objects.equals(input, "4") || Objects.equals(input, "join game")) {
             String id = getString("Please enter a game ID: ");
-            String team = getString("Please enter a team color to play as (white/black/none): ");
+            String team = getString("Please enter a team color to play as (white/black): ");
             ChessGame.TeamColor color = null;
             if (team.equals("white") || team.equals("w")){
                 color = ChessGame.TeamColor.WHITE;
             } else if (team.equals("black") || team.equals("b"))
                 color = ChessGame.TeamColor.BLACK;
+            else {
+                System.out.print("Did not understand input\n");
+                return "keep looping";
+            }
             int gameID = Integer.parseInt(id);
             Main.JoinResponse out = joinGame(gameID, color);
             if (out != null && out.playerColor != null) {
@@ -77,20 +83,28 @@ public class PregameMenu {
             } else {
                 //error handling
             }
-
             return "keep looping";
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "join observer")) {
-
+            String id = getString("Please enter a game ID: ");
+            int gameID = Integer.parseInt(id);
+            Main.JoinResponse out = joinGame(gameID, null);
+            if (out != null){
+                System.out.print("Joined game as an observer\n");
+            } else {
+                //error handling
+            }
+            return "keep looping";
         }
         else if (Objects.equals(input, "6") || Objects.equals(input, "logout")) {
-
+            System.out.print("Logging out...\n");
+            logout();
+            return "stop looping";
         }
         else {
             System.out.print("Input not understood. Try entering \"Help\" to view options.\n");
             return "keep looping";
         }
-        return "don't worry about it";
     }
 
     private int createGame(String name){
@@ -125,7 +139,15 @@ public class PregameMenu {
         } catch (Exception e) {
             return null;
         }
+    }
 
+    private void logout(){
+        HTTPHandler handler = new HTTPHandler(auth, url + "/session");
+        try {
+            Main.Response response = (Main.Response) handler.Request("DELETE", null, Main.Response.class);
+        } catch (Exception e) {
+            //error handling
+        }
     }
 
     private String getString(String prompt) {
