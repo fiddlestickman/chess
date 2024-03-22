@@ -31,6 +31,7 @@ public class GameHandler extends Handler {
             res.body(serialize(games));
             res.status(200);
             response.success=true;
+            response.code = 200;
             response.games = games;
             return serialize(response);
         } catch (DataAccessException e) { return error(e, res, 500);
@@ -49,6 +50,7 @@ public class GameHandler extends Handler {
             res.body(serialize(gameIDdata));
             res.status(200);
             response.success = true;
+            response.code = 200;
             response.gameID = gameID;
             return serialize(response);
         } catch (DataAccessException e) { return error(e, res, 500);
@@ -64,6 +66,7 @@ public class GameHandler extends Handler {
             gameserve.joinGame(auth, data.playerColor(), data.gameID());
             res.status(200);
             response.success = true;
+            response.code = 200;
             response.gameID = data.gameID();
             if (data.playerColor() == ChessGame.TeamColor.WHITE) {
                 response.playerColor = "WHITE";

@@ -51,6 +51,7 @@ public class Main {
 
     class Response {
         boolean success;
+        int code;
         String message = null;
     }
 

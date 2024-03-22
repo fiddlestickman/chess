@@ -21,8 +21,11 @@ public class ServerFacade {
             if (auth.success) {
                 return auth.authToken;
             } else {
-                throw new RequestException(auth.message, 500);
+                throw new RequestException(auth.message, auth.code);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return null;
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return null;
@@ -40,6 +43,9 @@ public class ServerFacade {
             } else {
                 throw new RequestException(auth.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return null;
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return null;
@@ -57,6 +63,9 @@ public class ServerFacade {
             } else {
                 throw new RequestException(game.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return -1;
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return -1;
@@ -72,6 +81,9 @@ public class ServerFacade {
             } else {
                 throw new RequestException(games.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return null;
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return null;
@@ -89,6 +101,9 @@ public class ServerFacade {
             } else {
                 throw new RequestException(response.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return null;
         } catch (Exception e) {
             System.out.print(e.getMessage());
             return null;
@@ -102,6 +117,8 @@ public class ServerFacade {
             if (!response.success) {
                 throw new RequestException(response.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
         } catch (Exception e) {
             System.out.print(e.getMessage());
         }
@@ -114,9 +131,10 @@ public class ServerFacade {
             if (!response.success) {
                 throw new RequestException(response.message, 500);
             }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
         } catch (Exception e) {
             System.out.print(e.getMessage());
         }
     }
-
 }

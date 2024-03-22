@@ -28,6 +28,7 @@ public class UserHandler extends Handler {
             res.status(200);
             res.body(serialize(authToken));
             response.success=true;
+            response.code = 200;
             response.authToken=authToken;
             response.username=data.username();
             return serialize(response);
@@ -44,6 +45,7 @@ public class UserHandler extends Handler {
             userserve.logout(auth);
             res.status(200);
             response.success = true;
+            response.code = 200;
             return serialize(response);
         } catch (DataAccessException e) { return error(e, res, 500);
         } catch (ServiceException e) { return error(e, res, e.getCode());
@@ -61,6 +63,7 @@ public class UserHandler extends Handler {
             res.body(authToken);
             res.status(200);
             response.success=true;
+            response.code = 200;
             response.authToken=authToken;
             response.username=data.username();
             return serialize(response);

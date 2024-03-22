@@ -1,6 +1,8 @@
 package clientTests;
 
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
+import server.GameHandler;
 import server.Server;
 import client.*;
 
@@ -12,9 +14,12 @@ public class ServerFacadeTests {
     private static Server server;
     private static int port;
     private ServerFacade facade;
+    private ServerFacade unauthfacade;
+
     private String existUser = "user";
     private String existPass = "pass";
     private String existEmail = "email";
+    private String existGame = "game";
 
     @BeforeAll
     public static void init() {
@@ -31,16 +36,11 @@ public class ServerFacadeTests {
     @BeforeEach
     public void setup() {
 
-        facade = new ServerFacade("http://localhost:" + port, null);
-        facade.clear();
-
-        String auth = facade.Register(existUser, existPass, existEmail);
-
+        unauthfacade = new ServerFacade("http://localhost:" + port, null);
+        unauthfacade.clear();
+        String auth = unauthfacade.Register(existUser, existPass, existEmail);
         facade = new ServerFacade("http://localhost:" + port, auth);
-    }
-    @Test
-    public void sampleTest() {
-        assertTrue(true);
+        facade.createGame(existGame);
     }
 
     @Test
@@ -58,4 +58,75 @@ public class ServerFacadeTests {
         assertNull(authData);
     }
 
+    @Test
+    void login() throws Exception {
+        var authData = facade.Login(existUser, existPass);
+        assertTrue(authData.length() > 10);
+    }
+
+    @Test
+    void loginBad() throws Exception {
+        var authData = facade.Login(existUser + "bad text", existPass);
+        assertNull(authData);
+
+        authData = facade.Login(existUser, existPass + "bad text");
+        assertNull(authData);
+    }
+
+    @Test
+    void createGame() throws Exception {
+        var gameID = facade.createGame("gameName");
+        assertNotEquals(gameID, -1);
+    }
+
+    @Test
+    void createGameBad() throws Exception {
+        var gameID = facade.createGame(null);
+        assertEquals(gameID, -1);
+
+
+        gameID = unauthfacade.createGame(null);
+        assertEquals(gameID, -1);
+    }
+
+    @Test
+    void listGames() throws Exception {
+        var games = facade.listGames();
+        assertNotNull(games);
+        assertFalse(games.isEmpty());
+        assertEquals(existGame, games.getFirst().gameName());
+
+        unauthfacade.clear();
+        String auth = unauthfacade.Login(existUser, existPass);
+        ServerFacade temp = new ServerFacade("http://localhost:" + port, auth);
+        games = temp.listGames();
+        assertNull(games);
+    }
+
+    @Test
+    void listGamesBad() throws Exception {
+        var games = unauthfacade.listGames();
+        assertNull(games);
+    }
+
+    @Test
+    void joinGame() throws Exception {
+        var games = facade.joinGame(1, null);
+        assertNotNull(games);
+
+        games = facade.joinGame(1, ChessGame.TeamColor.WHITE);
+        assertNotNull(games);
+    }
+    @Test
+    void joinGameBad() throws Exception {
+        var games = unauthfacade.joinGame(1, null);
+        assertNull(games);
+
+        games = facade.joinGame(-1, null);
+        assertNull(games);
+
+
+        games = facade.joinGame(1000, null);
+        assertNull(games);
+    }
 }

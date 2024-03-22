@@ -29,11 +29,13 @@ public class Handler {
         Response response = new Response();
         res.status(code);
         response.success = false;
+        response.code = code;
         response.message = "Error: " + e;
         return serialize(response);
     }
     class Response {
         boolean success;
+        int code;
         String message = null;
     }
 

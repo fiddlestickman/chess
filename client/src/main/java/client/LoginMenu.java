@@ -32,7 +32,12 @@ public class LoginMenu {
         else if (Objects.equals(input, "2") || Objects.equals(input, "login")) {
             String username = getString("Username: ");
             String password = getString("Password: ");
-            return facade.Login(username, password);
+            String auth = facade.Login(username, password);
+            if (auth == null) {
+                System.out.print("Something went wrong, please try again");
+                return "keep looping";
+            }
+            return auth;
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "register")) {
             String username = getString("Username: ");
@@ -40,13 +45,19 @@ public class LoginMenu {
             String password = getString("Password: ");
             String password2 = getString("Reenter Password: ");
             if (password.equals(password2)) {
-                return facade.Register(username, password, email);
+                String auth = facade.Register(username, password, email);
+                if (auth == null) {
+                    System.out.print("Something went wrong, please try again");
+                    return "keep looping";
+                }
+                return auth;
             } else {
                 System.out.print("Password doesn't match, please try again");
                 return "keep looping";
             }
         }
         else if (Objects.equals(input, "4") || Objects.equals(input, "quit")) {
+            System.out.print("Quitting program...");
             return "stop looping";
         }
         else {

@@ -25,6 +25,7 @@ public class AdminHandler extends Handler {
             admin.clear();
             res.status(200);
             response.success = true;
+            response.code = 200;
             return serialize(response);
         } catch (DataAccessException e) { return error(e, res, 500);
         }
@@ -34,6 +35,7 @@ public class AdminHandler extends Handler {
         Response response = new Response();
         res.status(200);
         response.success = true;
+        response.code = 200;
         response.message = "Greetings and good day!";
         //res.body(serialize(response));
         return serialize(response);
