@@ -110,31 +110,37 @@ public class ServerFacade {
         }
     }
 
-    public void logout(){
+    public boolean logout(){
         HTTPHandler handler = new HTTPHandler(auth, url + "/session");
         try {
             Main.Response response = (Main.Response) handler.Request("DELETE", null, Main.Response.class);
             if (!response.success) {
                 throw new RequestException(response.message, 500);
             }
+            return true;
         } catch (RequestException e) {
             System.out.print(e.getCode() + " - " + e.getMessage());
+            return false;
         } catch (Exception e) {
             System.out.print(e.getMessage());
+            return false;
         }
     }
 
-    public void clear() {
+    public boolean clear() {
         HTTPHandler handler = new HTTPHandler(auth, url + "/db");
         try {
             Main.Response response = (Main.Response) handler.Request("DELETE", null, Main.Response.class);
             if (!response.success) {
                 throw new RequestException(response.message, 500);
             }
+            return true;
         } catch (RequestException e) {
             System.out.print(e.getCode() + " - " + e.getMessage());
+            return false;
         } catch (Exception e) {
             System.out.print(e.getMessage());
+            return false;
         }
     }
 }

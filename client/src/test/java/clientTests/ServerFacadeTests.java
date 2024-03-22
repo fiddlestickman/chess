@@ -2,7 +2,6 @@ package clientTests;
 
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
-import server.GameHandler;
 import server.Server;
 import client.*;
 
@@ -129,4 +128,16 @@ public class ServerFacadeTests {
         games = facade.joinGame(1000, null);
         assertNull(games);
     }
+
+    @Test
+    void logout() throws Exception {
+        boolean success = facade.logout();
+        assertTrue(success);
+    }
+    @Test
+    void logoutBad() throws Exception {
+        boolean success = unauthfacade.logout();
+        assertFalse(success);
+    }
+
 }
