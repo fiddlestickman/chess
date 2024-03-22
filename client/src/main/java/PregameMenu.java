@@ -41,7 +41,7 @@ public class PregameMenu {
             ArrayList<GameData> games = listGames();
             if (games != null) {
                 Iterator<GameData> gameiter = games.iterator();
-                System.out.print("ID - Game Name - White Username - Black Username");
+                System.out.print("ID - Game Name - White Username - Black Username\n");
                 while (gameiter.hasNext()) {
                     GameData next = gameiter.next();
                     String white = next.whiteUsername();
