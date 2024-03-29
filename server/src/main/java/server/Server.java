@@ -1,6 +1,7 @@
 package server;
 
 import spark.*;
+import websocket.WSServer;
 
 public class Server {
 
@@ -25,6 +26,7 @@ private static void createRoutes() {
     Spark.get("/game", (req, res) -> GameHandler.getInstance().listGamesRequest(req, res));
     Spark.post("/game", (req, res) -> GameHandler.getInstance().createGameRequest(req, res));
     Spark.put("/game", (req, res) -> GameHandler.getInstance().joinGameRequest(req, res));
+    Spark.webSocket("/connect", WSServer.class);
 }
 public void stop() {
         Spark.stop();
