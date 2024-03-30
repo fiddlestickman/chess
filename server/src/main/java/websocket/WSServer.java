@@ -22,7 +22,6 @@ public class WSServer {
         //close the connection after doing things
     }
 
-
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         session.getRemote().sendString("WebSocket response: " + message);
