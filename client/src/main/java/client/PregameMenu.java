@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Scanner;
-
-import static ui.ChessboardUI.Print;
+import static ui.ChessboardUI.PrintWhite;
+import static ui.ChessboardUI.PrintBlack;
 
 public class PregameMenu {
     private static final String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
@@ -77,7 +77,8 @@ public class PregameMenu {
             Main.JoinResponse out = facade.joinGame(gameID, color);
             if (out != null && out.playerColor != null) {
                 System.out.printf("Joined game on the %s team.%n", out.playerColor);
-                Print(null);
+                PrintWhite(null);
+                PrintBlack(null);
             } else {
                 //error handling
             }
@@ -89,7 +90,8 @@ public class PregameMenu {
             Main.JoinResponse out = facade.joinGame(gameID, null);
             if (out != null){
                 System.out.print("Joined game as an observer\n");
-                Print(null);
+                PrintWhite(null);
+                PrintBlack(null);
             } else {
                 //error handling
             }

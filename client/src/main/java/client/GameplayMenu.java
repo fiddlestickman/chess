@@ -1,8 +1,10 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import ui.ChessboardUI;
 import webSocketMessages.serverMessages.*;
 
 import javax.websocket.*;
@@ -11,12 +13,20 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class GameplayMenu extends Endpoint {
-    private static String[] gameOptions = {"Help", "Redraw Chess Board", "Leave", "Make Move", "Resign", "Highlight Legal Moves"};
+    private static final String[] gameOptions = {"Help", "Redraw Board", "Leave", "Make Move", "Resign", "Highlight Legal Moves"};
     private final Session session;
     private final String auth;
-
-    public GameplayMenu(String auth, String gameUrl) throws Exception {
+    private final int gameID;
+    private final ChessGame.TeamColor color;
+    private ServerFacade facade;
+    public GameplayMenu(String auth, String portNum, int gameID, ChessGame.TeamColor color) throws Exception {
         this.auth = auth;
+        this.gameID = gameID;
+        this.color = color;
+
+        String gameUrl = "ws://localhost:" + portNum + "/connect";
+        String url = "http://localhost:" + portNum;
+        facade = new ServerFacade(url, auth);
         URI uri = new URI(gameUrl);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
@@ -41,7 +51,31 @@ public class GameplayMenu extends Endpoint {
             System.out.printf("%d. %s - Shows the legal moves a piece can make%n%n", 6, gameOptions[5]);
             return "keep looping";
         }
-
+        else if (Objects.equals(input, "2") || Objects.equals(input, "redraw board")) {
+            if (color == null || color == ChessGame.TeamColor.WHITE) {
+                ChessboardUI.PrintWhite(null);
+            } else if (color == ChessGame.TeamColor.BLACK) {
+                ChessboardUI.PrintWhite(null);
+            }
+        }
+        else if (Objects.equals(input, "3") || Objects.equals(input, "leave")) {
+            //return to pregame loop
+            //stop being on the team
+            //send a notification to the server
+        }
+        else if (Objects.equals(input, "4") || Objects.equals(input, "make move")) {
+            //get the move you want to make
+            //if it's legal, make a make move request
+        }
+        else if (Objects.equals(input, "5") || Objects.equals(input, "resign")) {
+            //resign the game (your team loses)
+            //return to pregame loop
+            //send a notification to the server
+        }
+        else if (Objects.equals(input, "6") || Objects.equals(input, "highlight") || Objects.equals(input, "highlight legal moves")) {
+            //highlight legal moves
+            //design chessboard thing to do that for you
+        }
         return "keep looping";
     }
 

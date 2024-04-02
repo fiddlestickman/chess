@@ -51,10 +51,9 @@ public class Main {
         }
     }
 
-    private static void gameplay (String auth, String portNum) {
-        String gameUrl = "ws://localhost:" + portNum + "/connect";
+    private static void gameplay (String auth, String portNum, int gameID, ChessGame.TeamColor color) {
         try {
-            GameplayMenu game = new GameplayMenu(auth, gameUrl);
+            GameplayMenu game = new GameplayMenu(auth, portNum, gameID, color);
         boolean loop = true;
 
         while (loop) {
