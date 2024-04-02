@@ -1,10 +1,17 @@
 package client;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import webSocketMessages.serverMessages.*;
+
 import javax.websocket.*;
 import java.net.URI;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class GameplayMenu extends Endpoint {
-
+    private static String[] gameOptions = {"Help", "Redraw Chess Board", "Leave", "Make Move", "Resign", "Highlight Legal Moves"};
     private final Session session;
     private final String auth;
 
@@ -16,13 +23,26 @@ public class GameplayMenu extends Endpoint {
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
-                System.out.println(message);
+                handleInput(message);
             }
         });
     }
 
     public String gameLoop() {
-        return "";
+        //get input here
+        String input = getString("[Do a thing]>>> ");
+        input = input.toLowerCase();
+        if (Objects.equals(input, "1") || Objects.equals(input, "help")) {
+            System.out.printf("%d. %s - Explains the different options available%n", 1, gameOptions[0]);
+            System.out.printf("%d. %s - Shows the current board state%n", 2, gameOptions[1]);
+            System.out.printf("%d. %s - Returns to the logged in menu%n", 3, gameOptions[2]);
+            System.out.printf("%d. %s - Lets you make a move%n", 4, gameOptions[3]);
+            System.out.printf("%d. %s - Forfeits the game and returns to the logged in menu%n", 5, gameOptions[4]);
+            System.out.printf("%d. %s - Shows the legal moves a piece can make%n%n", 6, gameOptions[5]);
+            return "keep looping";
+        }
+
+        return "keep looping";
     }
 
     public void send(String msg) throws Exception {
@@ -31,7 +51,63 @@ public class GameplayMenu extends Endpoint {
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
+
+    public void handleInput(String json) {
+        try {
+            ServerMessage message = deserialize(json);
+            if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                loadGame((LoadGameMessage) message);
+            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                notify((NotificationMessage) message);
+            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                //error handling
+            }
+        } catch (RequestException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void loadGame(LoadGameMessage message){
+        //redraw the board, using the new board
+        //also update the local board?
+    }
+    private void notify(NotificationMessage message){
+        //print text to the player
+    }
+
+
+    private ServerMessage deserialize (String body) throws RequestException {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        ServerMessage temp = gson.fromJson(body, ServerMessage.class);
+        if (temp.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            return gson.fromJson(body, LoadGameMessage.class);
+        } else if (temp.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            return gson.fromJson(body, NotificationMessage.class);
+        } else if (temp.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            return gson.fromJson(body, ErrorMessage.class);
+        } else {
+            throw new RequestException("there's no message type, what?", 500);
+        }
+    }
+
+    private String serialize (Object thing) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        return gson.toJson(thing);
+    }
+
+    private String getString(String prompt) {
+        System.out.print(prompt);
+        Scanner login = new Scanner(System.in);
+        String line = login.nextLine();
+        return line.strip();
+    }
 }
+
+
 
 
 /*

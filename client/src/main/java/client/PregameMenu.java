@@ -11,7 +11,7 @@ import java.util.Scanner;
 import static ui.ChessboardUI.Print;
 
 public class PregameMenu {
-    private static String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
+    private static final String[] pregameOptions = {"Help", "Create Game", "List Games", "Join Game", "Join Observer", "Logout"};
     private ServerFacade facade;
 
     public PregameMenu(String auth, String url) {
