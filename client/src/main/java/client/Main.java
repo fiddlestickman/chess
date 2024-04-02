@@ -12,14 +12,15 @@ public class Main {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         // Specify the desired endpoint
-        String serverUrl = "http://localhost:8080";
+        String portNum = "8080";
         if (args.length == 1) {
-            serverUrl = args[0];
+            portNum = args[0];
         }
 
-        login(serverUrl); //the login loop calls the pregame loop
+        login(portNum); //the login loop calls the pregame loop
     }
-    private static void login(String serverUrl){
+    private static void login(String portNum){
+        String serverUrl = "http://localhost:" + portNum;
         LoginMenu login = new LoginMenu(serverUrl);
         boolean loop = true;
         while (loop) {
@@ -33,7 +34,8 @@ public class Main {
             }
         }
     }
-    private static void pregame(String auth, String serverUrl) {
+    private static void pregame(String auth, String portNum) {
+        String serverUrl = "http://localhost:" + portNum;
         PregameMenu pregame = new PregameMenu(auth, serverUrl);
         boolean loop = true;
 
@@ -46,6 +48,28 @@ public class Main {
             else {
                 loop = false;
             }
+        }
+    }
+
+    private static void gameplay (String auth, String portNum) {
+        String gameUrl = "ws://localhost:" + portNum + "/connect";
+        try {
+            GameplayMenu game = new GameplayMenu(auth, gameUrl);
+        boolean loop = true;
+
+        while (loop) {
+            String out = game.gameLoop();
+            if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
+            else if (Objects.equals(out, "stop looping")) {
+                loop = false;
+            }
+            else {
+                loop = false;
+            }
+        }
+
+        } catch (Exception e) {
+            //error handling
         }
     }
 

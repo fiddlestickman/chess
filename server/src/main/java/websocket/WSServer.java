@@ -25,5 +25,8 @@ public class WSServer {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         session.getRemote().sendString("WebSocket response: " + message);
+        //put the things that handle incoming strings here - it's a really good
+        //connection point for taking client commands, maybe deserialize and go from there
+        //you can use session.getRemote().sendString(String str) to send a serialized response
     }
 }
