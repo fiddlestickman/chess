@@ -4,6 +4,9 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static ui.EscapeSequences.*;
 
@@ -18,7 +21,7 @@ public class ChessboardUI {
     private static String[] blackrows = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
 
-    public static void PrintWhite(String[] args) {
+    public static void PrintWhite() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -26,14 +29,14 @@ public class ChessboardUI {
         board.resetBoard();
 
         drawHeaders(out, true);
-        drawChessboard(out, true, board);
+        drawChessboard(out, true, board, null);
         drawHeaders(out, true);
 
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void PrintBlack(String[] args) {
+    public static void PrintBlack() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -41,7 +44,49 @@ public class ChessboardUI {
         board.resetBoard();
 
         drawHeaders(out, false);
-        drawChessboard(out, false, board);
+        drawChessboard(out, false, board, null);
+        drawHeaders(out, false);
+
+        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_TEXT_COLOR_WHITE);
+    }
+
+    public static void PrintWhiteHighlight(Collection<ChessMove> moves) {
+
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        ArrayList<ChessPosition> positions = new ArrayList<>();
+        Iterator<ChessMove> iter = moves.iterator();
+        while(iter.hasNext()) {
+            ChessMove next = iter.next();
+            positions.add(next.getEndPosition());
+        }
+        out.print(ERASE_SCREEN);
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+
+        drawHeaders(out, true);
+        drawChessboard(out, true, board, positions);
+        drawHeaders(out, true);
+
+        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_TEXT_COLOR_WHITE);
+    }
+
+    public static void PrintBlackHighlight(Collection<ChessMove> moves) {
+
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        ArrayList<ChessPosition> positions = new ArrayList<>();
+        Iterator<ChessMove> iter = moves.iterator();
+        while(iter.hasNext()) {
+            ChessMove next = iter.next();
+            positions.add(next.getEndPosition());
+        }
+        out.print(ERASE_SCREEN);
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+
+        drawHeaders(out, false);
+        drawChessboard(out, false, board, positions);
         drawHeaders(out, false);
 
         out.print(SET_BG_COLOR_DARK_GREY);
@@ -71,7 +116,7 @@ public class ChessboardUI {
         setBlack(out);
     }
 
-    private static void drawChessboard(PrintStream out, boolean white, ChessBoard board) {
+    private static void drawChessboard(PrintStream out, boolean white, ChessBoard board, ArrayList<ChessPosition> positions) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             out.print(SET_BG_COLOR_BLACK);
@@ -83,7 +128,7 @@ public class ChessboardUI {
             }
             setBlack(out);
 
-            drawRowOfSquares(out, boardRow, white, board);
+            drawRowOfSquares(out, boardRow, white, board, positions);
 
             out.print(SET_BG_COLOR_BLACK);
             out.print(SET_TEXT_COLOR_GREEN);
@@ -98,7 +143,7 @@ public class ChessboardUI {
         }
     }
 
-    private static void drawRowOfSquares(PrintStream out, int row, boolean white, ChessBoard board) {
+    private static void drawRowOfSquares(PrintStream out, int row, boolean white, ChessBoard board, ArrayList<ChessPosition> positions) {
 
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             int sum = boardCol + row;
@@ -119,7 +164,11 @@ public class ChessboardUI {
                 piece = getPiece(out, board, row+1, boardCol+1);
             }
 
-            printPlayer(out, piece, color, white);
+            boolean highlight = false;
+            if (positions.contains(new ChessPosition(row, boardCol)))
+                highlight = true;
+
+            printPlayer(out, piece, color, highlight);
             setBlack(out);
         }
     }
@@ -134,11 +183,13 @@ public class ChessboardUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void printPlayer(PrintStream out, String player, boolean bgcolor, boolean whitepiece) {
+    private static void printPlayer(PrintStream out, String player, boolean bgcolor, boolean highlight) {
         if (bgcolor) {
             out.print(SET_BG_COLOR_DARK_GREY);
         } else {
             out.print(SET_BG_COLOR_LIGHT_GREY);
+        } if (highlight) {
+            out.print(SET_BG_COLOR_YELLOW);
         }
         out.print(player);
         setWhite(out);

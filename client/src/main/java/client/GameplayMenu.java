@@ -1,35 +1,40 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import ui.ChessboardUI;
 import webSocketMessages.serverMessages.*;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class GameplayMenu extends Endpoint {
     private static final String[] gameOptions = {"Help", "Redraw Board", "Leave", "Make Move", "Resign", "Highlight Legal Moves"};
+    private static final String[] columns = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    private static final String[] rows = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private final Session session;
     private final String auth;
     private final int gameID;
     private final ChessGame.TeamColor color;
     private ServerFacade facade;
-
     private ChessGame game;
+
     public GameplayMenu(String auth, String portNum, int gameID, ChessGame.TeamColor color) throws Exception {
         this.auth = auth;
         this.gameID = gameID;
         this.color = color;
-
-
-        String gameUrl = "ws://localhost:" + portNum + "/connect";
         String url = "http://localhost:" + portNum;
         facade = new ServerFacade(url, auth);
+        String gameUrl = "ws://localhost:" + portNum + "/connect";
         URI uri = new URI(gameUrl);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
@@ -39,9 +44,11 @@ public class GameplayMenu extends Endpoint {
                 handleInput(message);
             }
         });
+
+        send(serialize(new JoinPlayerCommand(auth, gameID, color)));
     }
 
-    public String gameLoop() {
+    public String gameLoop() throws Exception{
         //get input here
         String input = getString("[Do a thing]>>> ");
         input = input.toLowerCase();
@@ -56,26 +63,41 @@ public class GameplayMenu extends Endpoint {
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "redraw board")) {
             if (color == null || color == ChessGame.TeamColor.WHITE) {
-                ChessboardUI.PrintWhite(null);
+                ChessboardUI.PrintWhite();
             } else if (color == ChessGame.TeamColor.BLACK) {
-                ChessboardUI.PrintWhite(null);
+                ChessboardUI.PrintBlack();
             }
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "leave")) {
-            //return to pregame loop
-            //stop being on the team
-            //send a notification to the server
+            LeaveCommand command = new LeaveCommand(auth, gameID);
+            send(serialize(command));
+            System.out.println("Leaving game (anyone can join)");
+            return "stop looping";
         }
         else if (Objects.equals(input, "4") || Objects.equals(input, "make move")) {
-            //get the move you want to make
-            //if it's legal, make a make move request
+            if (color != game.getTeamTurn()) {
+                System.out.println("Can't make a move on opponent's turn");
+                return "keep looping";
+            }
+            //actually make the move
+
+
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "resign")) {
-            //resign the game (your team loses)
-            //return to pregame loop
-            //send a notification to the server
+            ResignCommand command = new ResignCommand(auth, gameID);
+            send(serialize(command));
+            System.out.println("Resigning...");
+            return "stop looping";
         }
         else if (Objects.equals(input, "6") || Objects.equals(input, "highlight") || Objects.equals(input, "highlight legal moves")) {
+            String strpos = getString("Type the piece position");
+            ChessPosition pos = getPos(strpos);
+            if (pos == null) {
+                System.out.println("Did not understand input (format like a3, c6)");
+                return "keep looping";
+            }
+            Collection<ChessMove> moves = game.validMoves(pos);
+
             //highlight legal moves
             //design chessboard thing to do that for you
         }
@@ -105,11 +127,16 @@ public class GameplayMenu extends Endpoint {
     }
 
     private void loadGame(LoadGameMessage message){
-        //redraw the board, using the new board
-        //also update the local board?
+        this.game = message.getGame();
+        if (color == null || color == ChessGame.TeamColor.WHITE) {
+            ChessboardUI.PrintWhite();
+        } else if (color == ChessGame.TeamColor.BLACK) {
+            ChessboardUI.PrintBlack();
+        }
     }
+
     private void notify(NotificationMessage message){
-        //print text to the player
+        System.out.println(message.getMessage());
     }
 
 
@@ -142,6 +169,27 @@ public class GameplayMenu extends Endpoint {
         String line = login.nextLine();
         return line.strip();
     }
+
+    private ChessPosition getPos(String pos) {
+        int row = 0;
+        int col = 0;
+        for (int i = 0; i < columns.length; i++) {
+            if (pos.startsWith(columns[i])) {
+                col = i+1;
+            }
+        }
+        for (int i = 0; i < rows.length; i++) {
+            if (pos.endsWith(rows[i])) {
+                row = i+1;
+            }
+        }
+        if (row != 0 && col != 0) {
+            return new ChessPosition(row, col);
+        } else {
+            return null;
+        }
+    }
+
 }
 
 

@@ -77,8 +77,8 @@ public class PregameMenu {
             Main.JoinResponse out = facade.joinGame(gameID, color);
             if (out != null && out.playerColor != null) {
                 System.out.printf("Joined game on the %s team.%n", out.playerColor);
-                PrintWhite(null);
-                PrintBlack(null);
+                PrintWhite();
+                PrintBlack();
             } else {
                 //error handling
             }
@@ -90,8 +90,8 @@ public class PregameMenu {
             Main.JoinResponse out = facade.joinGame(gameID, null);
             if (out != null){
                 System.out.print("Joined game as an observer\n");
-                PrintWhite(null);
-                PrintBlack(null);
+                PrintWhite();
+                PrintBlack();
             } else {
                 //error handling
             }
