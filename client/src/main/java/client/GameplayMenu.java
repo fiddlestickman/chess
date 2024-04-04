@@ -19,10 +19,13 @@ public class GameplayMenu extends Endpoint {
     private final int gameID;
     private final ChessGame.TeamColor color;
     private ServerFacade facade;
+
+    private ChessGame game;
     public GameplayMenu(String auth, String portNum, int gameID, ChessGame.TeamColor color) throws Exception {
         this.auth = auth;
         this.gameID = gameID;
         this.color = color;
+
 
         String gameUrl = "ws://localhost:" + portNum + "/connect";
         String url = "http://localhost:" + portNum;

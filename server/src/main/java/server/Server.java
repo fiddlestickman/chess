@@ -24,6 +24,7 @@ private static void createRoutes() {
     Spark.post("/session", (req, res) -> UserHandler.getInstance().loginRequest(req, res));
     Spark.delete("/session", (req, res) -> UserHandler.getInstance().logoutRequest(req, res));
     Spark.get("/game", (req, res) -> GameHandler.getInstance().listGamesRequest(req, res));
+    Spark.get("/sg", (req, res) -> GameHandler.getInstance().getGameRequest(req, res));
     Spark.post("/game", (req, res) -> GameHandler.getInstance().createGameRequest(req, res));
     Spark.put("/game", (req, res) -> GameHandler.getInstance().joinGameRequest(req, res));
     Spark.webSocket("/connect", WSServer.class);

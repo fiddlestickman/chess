@@ -15,7 +15,6 @@ public class ServerFacade {
     public String Login(String username, String password) {
         HTTPHandler handler = new HTTPHandler(null, url + "/session");
         LoginData data = new LoginData(username, password);
-        handler.serialize(data);
         try {
             Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
             if (auth.success) {
@@ -35,7 +34,6 @@ public class ServerFacade {
     public String Register(String username, String password, String email) {
         HTTPHandler handler = new HTTPHandler(null, url + "/user");
         UserData data = new UserData(username, password, email);
-        handler.serialize(data);
         try {
             Main.LoginResponse auth = (Main.LoginResponse) handler.Request("POST", data, Main.LoginResponse.class);
             if (auth.success) {
@@ -55,7 +53,6 @@ public class ServerFacade {
     public int createGame(String name){
         HTTPHandler handler = new HTTPHandler(auth, url + "/game");
         CreateGameData data = new CreateGameData(name);
-        handler.serialize(data);
         try {
             Main.CreateResponse game = (Main.CreateResponse) handler.Request("POST", data, Main.CreateResponse.class);
             if (game.success) {
@@ -90,10 +87,28 @@ public class ServerFacade {
         }
     }
 
+    public GameData getGame(int gameID) {
+        HTTPHandler handler = new HTTPHandler(auth, url + "/sg");
+        GameIDData data = new GameIDData(gameID);
+        try {
+            Main.getGameResponse game = (Main.getGameResponse) handler.Request("GET", data, Main.getGameResponse.class);
+            if (game.success) {
+                return game.game;
+            } else {
+                throw new RequestException(game.message, 500);
+            }
+        } catch (RequestException e) {
+            System.out.print(e.getCode() + " - " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
+            return null;
+        }
+    }
+
     public Main.JoinResponse joinGame(int gameID, ChessGame.TeamColor color) {
         HTTPHandler handler = new HTTPHandler(auth, url + "/game");
         JoinGameData data = new JoinGameData(color, gameID);
-        handler.serialize(data);
         try {
             Main.JoinResponse response = (Main.JoinResponse) handler.Request("PUT", data, Main.JoinResponse.class);
             if (response.success) {

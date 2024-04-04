@@ -40,6 +40,24 @@ public class GameHandler extends Handler {
         }
     }
 
+    public Object getGameRequest(spark.Request req, spark.Response res) {
+        getGameResponse response = new getGameResponse();
+        try {
+            String auth = (String) deserialize(req.headers("authorization"), String.class);
+            GameIDData data = (GameIDData) deserialize(req.body(), GameIDData.class);
+            GameData game = gameserve.getGame(auth, data.gameID());
+            res.body(serialize(game));
+            res.status(200);
+            response.success=true;
+            response.code = 200;
+            response.game = game;
+            return serialize(response);
+        } catch (DataAccessException e) { return error(e, res, 500);
+        } catch (ServiceException e) { return error(e, res, e.getCode());
+        } catch (RequestException e) { return error(e, res, e.getCode());
+        }
+    }
+
     public Object createGameRequest(spark.Request req, spark.Response res) {
         CreateResponse response = new CreateResponse();
         try {
@@ -82,6 +100,10 @@ public class GameHandler extends Handler {
 
     class ListResponse extends Response {
         ArrayList<GameData> games;
+    }
+
+    class getGameResponse extends Response {
+        GameData game;
     }
 
     class CreateResponse extends Response {

@@ -86,7 +86,9 @@ public class Main {
     class ListResponse extends Response {
         ArrayList<GameData> games;
     }
-
+    class getGameResponse extends Response {
+        GameData game;
+    }
     class CreateResponse extends Response {
         int gameID;
     }

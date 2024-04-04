@@ -45,4 +45,10 @@ public class GameService extends Service {
 
         return gameDAO.readAll();
     }
+
+    public GameData getGame(String authToken, int gameID) throws DataAccessException , ServiceException {
+        GameDAO gameDAO = SQLGameDAO.getInstance();
+        AuthData auth = authenticate(authToken);
+        return gameDAO.readGameID(gameID);
+    }
 }
