@@ -2,6 +2,7 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -67,6 +68,7 @@ public class GameplayMenu extends Endpoint {
             } else if (color == ChessGame.TeamColor.BLACK) {
                 ChessboardUI.PrintBlack();
             }
+            return "keep looping";
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "leave")) {
             LeaveCommand command = new LeaveCommand(auth, gameID);
@@ -79,9 +81,14 @@ public class GameplayMenu extends Endpoint {
                 System.out.println("Can't make a move on opponent's turn");
                 return "keep looping";
             }
-            //actually make the move
+            ChessMove move = getMove();
+            Collection<ChessMove> legalmoves = game.validMoves(move.getStartPosition());
 
-
+            if (legalmoves.contains(move)) {
+                MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move);
+            } else {
+                System.out.println("That move is not legal (try highlighting legal moves)");
+            }
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "resign")) {
             ResignCommand command = new ResignCommand(auth, gameID);
@@ -97,9 +104,12 @@ public class GameplayMenu extends Endpoint {
                 return "keep looping";
             }
             Collection<ChessMove> moves = game.validMoves(pos);
-
-            //highlight legal moves
-            //design chessboard thing to do that for you
+            if (color == null || color == ChessGame.TeamColor.WHITE) {
+                ChessboardUI.PrintWhiteHighlight(moves);
+            } else if (color == ChessGame.TeamColor.BLACK) {
+                ChessboardUI.PrintBlackHighlight(moves);
+            }
+            return "keep looping";
         }
         return "keep looping";
     }
@@ -190,6 +200,33 @@ public class GameplayMenu extends Endpoint {
         }
     }
 
+    private ChessMove getMove() {
+        String strpos = getString("Type the piece move");
+        String[] temp = strpos.split(" ");
+        ChessPosition start = getPos(temp[0]);
+        ChessPosition end = getPos(temp[1]);
+        ChessPiece.PieceType promo = null;
+        if (game.getBoard().getPiece(start).getPieceType() == ChessPiece.PieceType.PAWN) {
+            if (end.getRow() == 1 || end.getRow() == 8) {
+                while (promo == null) {
+                    String getpromo = getString("What promotion?");
+                    getpromo = getpromo.toLowerCase();
+                    if (getpromo == "q" || getpromo == "queen") {
+                        promo = ChessPiece.PieceType.QUEEN;
+                    } else if (getpromo == "r" || getpromo == "rook") {
+                        promo = ChessPiece.PieceType.ROOK;
+                    } else if (getpromo == "k" || getpromo == "knight") {
+                        promo = ChessPiece.PieceType.KNIGHT;
+                    } else if (getpromo == "b" || getpromo == "bishop") {
+                        promo = ChessPiece.PieceType.BISHOP;
+                    } else {
+                        System.out.println("Input not understood (please type q/r/k/b)\n");
+                    }
+                }
+            }
+        }
+        return new ChessMove(start, end, promo);
+    }
 }
 
 
