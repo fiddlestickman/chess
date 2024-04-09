@@ -114,6 +114,29 @@ public class GameplayMenu extends Endpoint {
         return "keep looping";
     }
 
+    public String ObserveLoop() throws Exception {
+        String input = getString("[Observing]>>> ");
+        input = input.toLowerCase();
+        if (input.equals("quit")) {
+            LeaveCommand command = new LeaveCommand(auth, gameID);
+            send(serialize(command));
+            System.out.println("Leaving game...");
+            return "stop looping";
+        } else if (input.equals("redraw board")) {
+            String strcolor = getString("Which perspective? (b/w))");
+            strcolor = strcolor.toLowerCase();
+            if (strcolor.equals("w") || strcolor.equals("white")) {
+                ChessboardUI.PrintWhite();
+            } else if (strcolor.equals("b") || strcolor.equals("black")) {
+                ChessboardUI.PrintBlack();
+            }
+            return "keep looping";
+        } else {
+            System.out.println("Did not understand input (type 'quit' or 'redraw board')");
+            return "keep looping";
+        }
+    }
+
     public void send(String msg) throws Exception {
         this.session.getBasicRemote().sendText(msg);
     }
