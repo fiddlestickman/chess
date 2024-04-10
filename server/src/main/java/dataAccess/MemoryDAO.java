@@ -41,6 +41,13 @@ class MemoryDAO<T> {
         return database;
     }
 
+    public Collection<T> readAll(T t, String var) {
+        ArrayList<T> output = new ArrayList<>();
+
+
+        return output;
+    }
+
     public void update(T newvalue, String var) {
         Iterator<T> iter = database.iterator();
         SearchOperation update = (search, inbase) -> { iter.remove(); return null;};
