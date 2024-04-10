@@ -34,4 +34,12 @@ public class WSService {
         }
         return users;
     }
+
+    public void delete(String username, int gameID) throws DataAccessException {
+        WatchDAO watchDAO = SQLWatchDAO.getInstance();
+        WatchData watch = watchDAO.findWatch(username, gameID);
+        if (watch != null) {
+            watchDAO.delete(watch);
+        }
+    }
 }

@@ -11,6 +11,7 @@ import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WSManager {
@@ -38,23 +39,37 @@ public class WSManager {
     }
 
     public void loadGame(int gameID, String host, LoadGameMessage message) {
+        //send the current game state to each client
 
+        ArrayList<String> users;
         WSService service = new WSService();
         try {
-            ArrayList<String> users = service.getUsers(gameID); //these are all the users, both watching and playing
+            users = service.getUsers(gameID); //these are all the users, both watching and playing
         } catch (Exception e) {
-
+            //error handling
+            return;
         }
 
-        for (var c : connections.values()) {
-            if (c.getSession().isOpen()) {
+        Iterator<String> iter = users.iterator();
 
+        while(iter.hasNext()) {
+            String next = iter.next();
+            Connection connection = connections.get(next);
+            try {
+                if (connection.getSession().isOpen()) {
+                    connection.getSession().getRemote().sendString("");
+                } else {
+                    service.
+                }
+            } catch (Exception e) {
+                //error handling
             }
         }
-        session.getRemote().sendString("WebSocket response: " + message);
+
     }
     public void notify(int gameID, String host, NotificationMessage message) {
-
+        //sends a message meant to inform a player when another player made an action
+        //send to all players other than the host (client responsible for notification)
         for (var c : connections.values()) {
             if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
 
@@ -66,14 +81,14 @@ public class WSManager {
             if (c.getSession().isOpen()) {
 
             } else {
-                removeList.add(c);
+            //    removeList.add(c);
             }
         }
-        session.getRemote().sendString("WebSocket response: " + message);
+        //session.getRemote().sendString("WebSocket response: " + message);
     }
 
     public void errorBroadcast(int gameID, String host, ErrorMessage message) {
-
+        //send to the client when it sends an invalid command.
         for (var c : connections.values()) {
             if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
 
@@ -85,10 +100,10 @@ public class WSManager {
             if (c.getSession().isOpen()) {
 
             } else {
-                removeList.add(c);
+            //    removeList.add(c);
             }
         }
-        session.getRemote().sendString("WebSocket response: " + message);
+        //session.getRemote().sendString("WebSocket response: " + message);
     }
 
     private class Connection {

@@ -27,7 +27,8 @@ public class WSServer {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        UserGameCommand command = (UserGameCommand) userHandle.deserialize(message, UserGameCommand.class);
+        Handler handler = new Handler();
+        UserGameCommand command = (UserGameCommand) handler.deserialize(message, UserGameCommand.class);
         if (command.getCommandType() == UserGameCommand.CommandType.JOIN_PLAYER) {
 
 

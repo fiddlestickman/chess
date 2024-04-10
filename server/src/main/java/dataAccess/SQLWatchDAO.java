@@ -49,6 +49,25 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
         return result;
     }
 
+
+    public WatchData findWatch(String username, int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID FROM watch WHERE username=? gameID=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                ps.setInt(2, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readWatch(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     public void delete(WatchData w) throws DataAccessException {
         var statement = "DELETE FROM auth WHERE username=?";
         executeUpdate(statement, w.username());
