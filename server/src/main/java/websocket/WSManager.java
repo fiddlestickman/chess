@@ -2,6 +2,7 @@ package websocket;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import server.Handler;
@@ -57,9 +58,9 @@ public class WSManager {
             Connection connection = connections.get(next);
             try {
                 if (connection.getSession().isOpen()) {
-                    connection.getSession().getRemote().sendString("");
+                    connection.getSession().getRemote().sendString(serialize(message));
                 } else {
-                    service.
+                    service.delete(next, gameID);
                 }
             } catch (Exception e) {
                 //error handling
@@ -121,5 +122,12 @@ public class WSManager {
         Session getSession() {
             return session;
         }
+    }
+
+    public String serialize (Object thing) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        return gson.toJson(thing);
     }
 }

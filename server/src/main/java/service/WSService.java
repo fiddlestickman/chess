@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class WSService {
+public class WSService extends Service {
 
     public WSService() {}
 
