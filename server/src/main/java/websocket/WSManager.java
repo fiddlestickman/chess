@@ -39,7 +39,7 @@ public class WSManager {
         connections.remove(username);
     }
 
-    public void loadGame(int gameID, String host, LoadGameMessage message) {
+    public void loadGame(int gameID, LoadGameMessage message) {
         //send the current game state to each client
 
         ArrayList<String> users;
@@ -69,42 +69,46 @@ public class WSManager {
 
     }
     public void notify(int gameID, String host, NotificationMessage message) {
-        //sends a message meant to inform a player when another player made an action
-        //send to all players other than the host (client responsible for notification)
-        for (var c : connections.values()) {
-            if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
 
-            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+        ArrayList<String> users;
+        WSService service = new WSService();
+        try {
+            users = service.getUsers(gameID); //these are all the users, both watching and playing
+        } catch (Exception e) {
+            //error handling
+            return;
+        }
 
-            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+        Iterator<String> iter = users.iterator();
 
-            }
-            if (c.getSession().isOpen()) {
-
-            } else {
-            //    removeList.add(c);
+        while(iter.hasNext()) {
+            String next = iter.next();
+            Connection connection = connections.get(next);
+            if (!next.equals(host)) {
+                try {
+                    if (connection.getSession().isOpen()) {
+                        connection.getSession().getRemote().sendString(serialize(message));
+                    } else {
+                        service.delete(next, gameID);
+                    }
+                } catch (Exception e) {
+                    //error handling
+                }
             }
         }
         //session.getRemote().sendString("WebSocket response: " + message);
     }
 
-    public void errorBroadcast(int gameID, String host, ErrorMessage message) {
-        //send to the client when it sends an invalid command.
-        for (var c : connections.values()) {
-            if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+    public void errorBroadcast(String host, ErrorMessage message) {
 
-            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-
-            } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-
+        Connection connection = connections.get(host);
+        try {
+            if (connection.getSession().isOpen()) {
+                connection.getSession().getRemote().sendString(serialize(message));
             }
-            if (c.getSession().isOpen()) {
-
-            } else {
-            //    removeList.add(c);
-            }
+        } catch (Exception e) {
+            //error handling
         }
-        //session.getRemote().sendString("WebSocket response: " + message);
     }
 
     private class Connection {
