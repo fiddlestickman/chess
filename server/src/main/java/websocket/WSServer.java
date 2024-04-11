@@ -63,6 +63,7 @@ public class WSServer {
             String username = manager.getLeave(leave);
 
             broadcastAllOthers(leave.getGameID(), session, notification);
+            session.close();
             connections.remove(username);
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             ResignCommand resign = (ResignCommand) command;
