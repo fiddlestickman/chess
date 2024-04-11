@@ -38,36 +38,43 @@ public class WSServer {
 
         UserGameCommand command = (UserGameCommand) handler.deserialize(message, UserGameCommand.class);
         if (command.getCommandType() == UserGameCommand.CommandType.JOIN_PLAYER) {
+            JoinPlayerCommand join = (JoinPlayerCommand) command;
+            NotificationMessage notification = manager.joinPlayerNotify(join);
+            LoadGameMessage loadgame = manager.loadGame(join);
 
+            broadcastOne(session, loadgame);
+            broadcastAllOthers(join.getGameID(), session, notification);
 
-
-            JoinPlayerCommand temp = (JoinPlayerCommand) command;
-            temp.getAuthString();
-            temp.getGameID();
-            temp.getColor();
-
-            //send a notification to all other clients that a player is joining, and what color
         } else if (command.getCommandType() == UserGameCommand.CommandType.JOIN_OBSERVER) {
-            NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "idk");
-            String out = handler.serialize(notification);
-            session.getRemote().sendString(out);
-            //send a notification to all other clients that a player is joining as an observer
+            JoinObserverCommand join = (JoinObserverCommand) command;
+            NotificationMessage notification = manager.joinObserverNotify(join);
+            LoadGameMessage loadgame = manager.loadGame(join);
+
+            broadcastOne(session, loadgame);
+            broadcastAllOthers(join.getGameID(), session, notification);
+
         } else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
-            //verify validity of move
-            //update game in the database
-            //send a load game message to all clients (including root) with updated game
-            //send notification to all other clients what move was made
+            MakeMoveCommand move = (MakeMoveCommand) command;
+            LoadGameMessage loadgame = manager.makeMove(move);
+            NotificationMessage notification = manager.makeMoveNotification(move);
+
+            broadcastAll(move.getGameID(), loadgame);
+            broadcastAllOthers(move.getGameID(), session, notification);
+
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
-            //remove client from the game
-            //send a notification to all other clients that they left
+            LeaveCommand leave = (LeaveCommand) command;
+            NotificationMessage notification = manager.leave(leave);
+
+            broadcastAllOthers(leave.getGameID(), session, notification);
+
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
-            //mark the game as over - update game in the database
-            //send a notification to all clients that game is over, and all others than root that client has resigned
+            ResignCommand resign = (ResignCommand) command;
+            LoadGameMessage loadgame = manager.resign(resign);
+            NotificationMessage notification = manager.resignMessage(resign);
+
+            broadcastAll(resign.getGameID(), loadgame);
+            broadcastAllOthers(resign.getGameID(), session, notification);
         }
-        session.getRemote().sendString("WebSocket response: " + message);
-        //put the things that handle incoming strings here - it's a really good
-        //connection point for taking client commands, maybe deserialize and go from there
-        //you can use session.getRemote().sendString(String str) to send a serialized response
     }
 
     public void add(String username, Session session) {
@@ -79,8 +86,8 @@ public class WSServer {
         connections.remove(username);
     }
 
-    public void loadGame(int gameID, LoadGameMessage message) {
-        //send the current game state to each client
+    public void broadcastAll(int gameID, ServerMessage message) {
+        //send the message to each client
 
         ArrayList<String> users;
         WSService service = new WSService();
@@ -108,7 +115,7 @@ public class WSServer {
         }
 
     }
-    public void notify(int gameID, String host, NotificationMessage message) {
+    public void broadcastAllOthers(int gameID, Session session, ServerMessage message) {
 
         ArrayList<String> users;
         WSService service = new WSService();
@@ -124,7 +131,7 @@ public class WSServer {
         while(iter.hasNext()) {
             String next = iter.next();
             Connection connection = connections.get(next);
-            if (!next.equals(host)) {
+            if (!connection.session.equals(session)) {
                 try {
                     if (connection.getSession().isOpen()) {
                         connection.getSession().getRemote().sendString(serialize(message));
@@ -138,12 +145,11 @@ public class WSServer {
         }
     }
 
-    public void errorBroadcast(String host, ErrorMessage message) {
+    public void broadcastOne(Session session, ServerMessage message) {
         //only sends an error to the user that made the command
-        Connection connection = connections.get(host);
         try {
-            if (connection.getSession().isOpen()) {
-                connection.getSession().getRemote().sendString(serialize(message));
+            if (session.isOpen()) {
+                session.getRemote().sendString(serialize(message));
             }
         } catch (Exception e) {
             //error handling

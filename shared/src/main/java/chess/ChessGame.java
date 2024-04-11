@@ -1,7 +1,6 @@
 package chess;
 
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -21,24 +20,24 @@ public class ChessGame {
     boolean whiteksc;
     boolean blackqsc;
     boolean blackksc;
+    boolean gameOver;
     public ChessGame() {
-        //make the board
         board = new ChessBoard();
-        //set up the board
         board.resetBoard();
-        //set start player to white
         currentPlayer = TeamColor.WHITE;
-        //lets the players castle from the start
         whiteqsc = true;
         whiteksc = true;
         blackqsc = true;
         blackksc = true;
+        gameOver = false;
     }
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn()
     {
+        if (gameOver)
+            return null;
         return currentPlayer;
     }
     /**
@@ -65,6 +64,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        if (gameOver)
+            return null;
         //finds the piece on the board being tested
         ChessPiece piece = board.getPiece(startPosition);
         //get the possible moves that piece can make and set up possible legal moves
@@ -98,6 +99,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (gameOver)
+            throw new InvalidMoveException("Game Over, no moves allowed");
         ChessPiece mypiece = board.getPiece(move.getStartPosition());
         //get the piece that made the last move (important for en passant)
         ChessPiece lastpiece = null;
@@ -192,6 +195,8 @@ public class ChessGame {
             currentPlayer = TeamColor.BLACK;
         else if (currentPlayer == TeamColor.BLACK)
             currentPlayer = TeamColor.WHITE;
+        if (noLegalMoves(currentPlayer))
+            gameOver = true;
     }
     private void makeCastleMove (ChessMove move, ChessPiece mypiece) {
         //castle moves are the only king moves where the king moves two squares
@@ -228,8 +233,6 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //finds the friendly king
-        //only works if there's one king
         ChessPosition kingPosition = findKing(teamColor);
         if (kingPosition == null)
             return false;
@@ -354,8 +357,6 @@ public class ChessGame {
                 }
             }
         }
-        //there's no escape move for the king, and no piece can legally move
-        //it's checkmate or stalemate
         return true;
     }
     //returns a collection of legal castling moves
@@ -425,11 +426,9 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
-        //only pawns can en passant
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
             return legalMoves;
         }
-        //and even then, only on the fourth or fifth rank
         if (piece.getTeamColor() == TeamColor.WHITE && row != 5) {
             return legalMoves;
         }
@@ -472,12 +471,18 @@ public class ChessGame {
         ChessPosition kingPosition = null;
         for (int i = 1; i <= 8; i++) { // rows (white to black)
             for (int j = 1; j <= 8; j++) { //columns (queenside to kingside)
-                //if the chess piece on the square is the friendly king
                 if (Objects.equals(board.getPiece(new ChessPosition(i, j)), new ChessPiece(teamColor, ChessPiece.PieceType.KING)))
                     kingPosition = new ChessPosition(i, j);
             }
         }
         return kingPosition;
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void resign() {
+        gameOver = true;
     }
     @Override
     public boolean equals(Object o) {

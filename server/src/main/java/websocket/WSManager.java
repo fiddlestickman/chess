@@ -140,13 +140,8 @@ public class WSManager {
         }
 
         gameDAO.update(gamedata);
-        new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
+        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
 
-        //server verifies validity of the move
-        //updates the game to represent the move
-        //send a load_game message to all clients
-        //send a notification to all other clients
-        return null;
     }
     public NotificationMessage makeMoveNotification(MakeMoveCommand command) throws DataAccessException {
         String auth = command.getAuthString();
@@ -197,8 +192,12 @@ public class WSManager {
 
         AuthDAO authDAO = SQLAuthDAO.getInstance();
         GameDAO gameDAO = SQLGameDAO.getInstance();
+        WatchDAO watchDAO = SQLWatchDAO.getInstance();
 
         AuthData authdata = authDAO.readAuth(auth);
+        if(authdata == null) {
+            throw new DataAccessException("Authtoken was wrong");
+        }
         GameData game = gameDAO.readGameID(gameID);
 
         if (Objects.equals(authdata.username(), game.whiteUsername())) {
@@ -206,30 +205,81 @@ public class WSManager {
         } else if (Objects.equals(authdata.username(), game.blackUsername())) {
             gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game()));
         } else {
-            throw new DataAccessException("A non-player tried to leave the");
+            WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
+            if (watch == null) {
+                throw new DataAccessException("A non-player, non-observer tried to leave the game");
+            }
+            watchDAO.delete(watch);
+            String notice = authdata.username() + "has stopped observing\n";
+            return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
         }
 
-        String builder = authdata.username() +
-                " has left the game\n";
+        String notice = authdata.username() + " has left the game\n";
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, builder);
+        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
     }
 
     public LoadGameMessage resign(ResignCommand command) throws DataAccessException {
-        //update game as over in the database
-        //send a notification to all other clients
-        return null;
+        int gameID = command.getGameID();
+        String auth = command.getAuthString();
+
+        AuthDAO authDAO = SQLAuthDAO.getInstance();
+        GameDAO gameDAO = SQLGameDAO.getInstance();
+
+        AuthData authdata = authDAO.readAuth(auth);
+        if(authdata == null) {
+            throw new DataAccessException("Authtoken was wrong");
+        }
+        GameData game = gameDAO.readGameID(gameID);
+
+        if (Objects.equals(authdata.username(), game.whiteUsername())) {
+            game.game().resign();
+            gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
+        } else if (Objects.equals(authdata.username(), game.blackUsername())) {
+            game.game().resign();
+            gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
+        } else {
+            throw new DataAccessException("A non-player tried to resign");
+        }
+        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
     }
+
     public NotificationMessage resignMessage(ResignCommand command) throws DataAccessException {
-        return null;
+        int gameID = command.getGameID();
+        String auth = command.getAuthString();
+
+        AuthDAO authDAO = SQLAuthDAO.getInstance();
+        GameDAO gameDAO = SQLGameDAO.getInstance();
+
+        AuthData authdata = authDAO.readAuth(auth);
+        if(authdata == null) {
+            throw new DataAccessException("Authtoken was wrong");
+        }
+        GameData game = gameDAO.readGameID(gameID);
+
+        String strcolor = null;
+        String enemycolor = null;
+        if (Objects.equals(game.whiteUsername(), authdata.username())) {
+            strcolor = "WHITE";
+            enemycolor = "BLACK";
+        } else if (Objects.equals(game.blackUsername(), authdata.username())) {
+            strcolor = "BLACK";
+            enemycolor = "WHITE";
+        }
+        if (strcolor == null) {
+            throw new DataAccessException("no turn color, what?");
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("Player ");
+        builder.append(authdata.username());
+        builder.append(" on the ");
+        builder.append(strcolor);
+        builder.append("team has resigned\n");
+        builder.append(enemycolor);
+        builder.append(" wins!\n");
+
+        String join = builder.toString();
+
+        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
-
-    //have a list of all the connections that matter
-    //pair connections with usernames somehow
-    //when you try to broadcast, look up with DAOs the relevant users
-    //if there are connections (there should be), broadcast to each of those paired sessions
-    //also use DAOs to update who's on what game
-    //and game state
-    //make sure game moves are legal
-
 }
