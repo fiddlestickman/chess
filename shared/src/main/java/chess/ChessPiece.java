@@ -406,4 +406,29 @@ public class ChessPiece {
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
+    }
+
+    public String pieceToString() {
+        if (type == PieceType.PAWN)
+            return "PAWN";
+        else if (type == PieceType.KNIGHT)
+            return "KNIGHT";
+        else if (type == PieceType.BISHOP)
+            return "BISHOP";
+        else if (type == PieceType.ROOK)
+            return "ROOK";
+        else if (type == PieceType.QUEEN)
+            return "QUEEN";
+        else if (type == PieceType.KING)
+            return "KING";
+        else
+            return "NULL";
+    }
 }
