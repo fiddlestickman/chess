@@ -219,6 +219,16 @@ public class WSManager {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
     }
 
+    public String getLeave(LeaveCommand command) throws DataAccessException {
+        String auth = command.getAuthString();
+        AuthDAO authDAO = SQLAuthDAO.getInstance();
+        AuthData authdata = authDAO.readAuth(auth);
+        if(authdata == null) {
+            throw new DataAccessException("Authtoken was wrong");
+        }
+        return authdata.username();
+    }
+
     public LoadGameMessage resign(ResignCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();

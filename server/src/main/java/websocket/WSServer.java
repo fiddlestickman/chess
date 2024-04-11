@@ -4,14 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
-import server.GameHandler;
 import server.Handler;
-import server.UserHandler;
 import service.WSService;
-import spark.Spark;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,9 +60,10 @@ public class WSServer {
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
             LeaveCommand leave = (LeaveCommand) command;
             NotificationMessage notification = manager.leave(leave);
+            String username = manager.getLeave(leave);
 
             broadcastAllOthers(leave.getGameID(), session, notification);
-
+            connections.remove(username);
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             ResignCommand resign = (ResignCommand) command;
             LoadGameMessage loadgame = manager.resign(resign);
