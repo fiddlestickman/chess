@@ -26,7 +26,7 @@ public class UserGameCommand {
         this.commandType = type;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.color = color;
+        this.playerColor = color;
     }
     public UserGameCommand(CommandType type, String authToken, int gameID) {
         this.commandType = type;
@@ -45,13 +45,13 @@ public class UserGameCommand {
     private final String authToken;
     private int gameID = -1;
     private ChessMove move = null;
-    private ChessGame.TeamColor color = null;
+    private ChessGame.TeamColor playerColor = null;
     public String getAuthString() {
         return authToken;
     }
     public int getGameID() {return gameID;}
     public ChessMove getMove() {return move;}
-    public ChessGame.TeamColor getColor() {return color;}
+    public ChessGame.TeamColor getColor() {return playerColor;}
     public CommandType getCommandType() {
         return this.commandType;
     }

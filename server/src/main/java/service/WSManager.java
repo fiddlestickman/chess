@@ -38,10 +38,16 @@ public class WSManager extends service.Service {
 
         String strcolor = "";
 
-        if (Objects.equals(gamedata.whiteUsername(), authdata.username())) {
+        if (color == ChessGame.TeamColor.WHITE) {
             strcolor = "white";
-        } else if (Objects.equals(gamedata.blackUsername(), authdata.username())) {
+            if (!Objects.equals(gamedata.whiteUsername(), authdata.username())) {
+                return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Username wasn't for the right player");
+            }
+        } else if (color == ChessGame.TeamColor.BLACK) {
             strcolor = "black";
+            if (!Objects.equals(gamedata.blackUsername(), authdata.username())) {
+                return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Username wasn't for the right player");
+            }
         } else {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Username did not match either player");
         }
@@ -120,6 +126,20 @@ public class WSManager extends service.Service {
 
         GameData gamedata = gameDAO.readGameID(gameID);
         ChessGame game = gamedata.game();
+        if (game.isGameOver()) {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Can't make a move when the game is over");
+        }
+
+        ChessGame.TeamColor color = null;
+        if (Objects.equals(gamedata.whiteUsername(), authdata.username())) {
+            color = ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(gamedata.blackUsername(), authdata.username())) {
+            color = ChessGame.TeamColor.BLACK;
+        }
+        if (color != game.getTeamTurn()) {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Can't make a move for your opponent");
+        }
+
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
@@ -135,14 +155,14 @@ public class WSManager extends service.Service {
         GameDAO gameDAO = SQLGameDAO.getInstance();
 
         GameData gamedata = gameDAO.readGameID(command.getGameID());
-
-        ChessGame.TeamColor newcolor = gamedata.game().getTeamTurn();
-
+        if (gamedata.game().isGameOver()) {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Can't make a move when the game is over");
+        }
         ChessMove move = command.getMove();
         ChessPosition end = move.getEndPosition();
 
         ChessPiece piece = gamedata.game().getBoard().getPiece(end);
-
+        int j = 0;
         AuthData authdata;
         try {
             authdata = authenticate(auth);
@@ -153,15 +173,15 @@ public class WSManager extends service.Service {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
 
-
-        String strcolor = "";
+        String strcolor;
 
         if (Objects.equals(gamedata.whiteUsername(), authdata.username())) {
             strcolor = "white";
         } else if (Objects.equals(gamedata.blackUsername(), authdata.username())) {
             strcolor = "black";
-        } else {
-            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "no turn color, what?");
+        }
+        else {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Got a move request by a non-player");
         }
 
         String files = "ABCDEFGH";
@@ -230,6 +250,10 @@ public class WSManager extends service.Service {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
         GameData game = gameDAO.readGameID(gameID);
+        if (game.game().isGameOver()) {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Trying to resign when the game is already over");
+        }
+
 
         if (Objects.equals(authdata.username(), game.whiteUsername())) {
             game.game().resign();
@@ -260,18 +284,18 @@ public class WSManager extends service.Service {
         }
         GameData game = gameDAO.readGameID(gameID);
 
-        String strcolor = null;
-        String enemycolor = null;
-        if (Objects.equals(game.whiteUsername(), authdata.username())) {
+        String strcolor;
+        String enemycolor;
+        if (Objects.equals(authdata.username(), game.whiteUsername())) {
             strcolor = "WHITE";
             enemycolor = "BLACK";
-        } else if (Objects.equals(game.blackUsername(), authdata.username())) {
+        } else if (Objects.equals(authdata.username(), game.blackUsername())) {
             strcolor = "BLACK";
             enemycolor = "WHITE";
-        }
-        if (strcolor == null) {
+        } else {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "no turn color, what?");
         }
+
         StringBuilder builder = new StringBuilder();
         builder.append("Player ");
         builder.append(authdata.username());

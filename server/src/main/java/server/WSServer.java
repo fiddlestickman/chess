@@ -98,19 +98,20 @@ public class WSServer {
             session.close();
             connections.remove(command.getAuthString());
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
-            ServerMessage notification = manager.resignMessage(command);
-            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
-                broadcastOne(session, notification);
-                return;
-            }
             ServerMessage loadgame = manager.resign(command);
             if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
                 broadcastOne(session, loadgame);
                 return;
             }
 
-            broadcastAll(command.getGameID(), loadgame);
-            broadcastAllOthers(command.getGameID(), session, notification);
+            ServerMessage notification = manager.resignMessage(command);
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+                broadcastOne(session, notification);
+                return;
+            }
+
+            broadcastAll(command.getGameID(), notification);
+            //broadcastAll(command.getGameID(), loadgame);
         }
     }
 
