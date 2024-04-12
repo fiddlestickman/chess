@@ -68,16 +68,16 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
 
         WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
 
         if (watch == null) {
-            throw new DataAccessException("No watcher with that authtoken found");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "No watcher with that authtoken found");
         }
 
         StringBuilder builder = new StringBuilder();
@@ -96,7 +96,7 @@ public class WSManager extends service.Service {
         GameData gamedata = gameDAO.readGameID(gameID);
 
         if (gamedata == null) {
-            throw new DataAccessException("No game found with given gameID");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "No game found with given gameID");
         }
         return new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
     }
@@ -112,17 +112,18 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
 
         GameData gamedata = gameDAO.readGameID(gameID);
+        ChessGame game = gamedata.game();
         try {
-            gamedata.game().makeMove(move);
+            game.makeMove(move);
         } catch (InvalidMoveException e) {
-            throw new DataAccessException("Illegal move sent");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Illegal move sent");
         }
 
         gameDAO.update(gamedata);
@@ -146,20 +147,21 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
 
-        String strcolor = null;
-        if (newcolor == ChessGame.TeamColor.WHITE) {
-            strcolor = "BLACK";
-        } else if (newcolor == ChessGame.TeamColor.BLACK) {
-            strcolor = "WHITE";
-        }
-        if (strcolor == null) {
-            throw new DataAccessException("no turn color, what?");
+
+        String strcolor = "";
+
+        if (Objects.equals(gamedata.whiteUsername(), authdata.username())) {
+            strcolor = "white";
+        } else if (Objects.equals(gamedata.blackUsername(), authdata.username())) {
+            strcolor = "black";
+        } else {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "no turn color, what?");
         }
 
         String files = "ABCDEFGH";
@@ -187,10 +189,10 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
         GameData game = gameDAO.readGameID(gameID);
 
@@ -201,7 +203,7 @@ public class WSManager extends service.Service {
         } else {
             WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
             if (watch == null) {
-                throw new DataAccessException("A non-player, non-observer tried to leave the game");
+                return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "A non-player, non-observer tried to leave the game");
             }
             watchDAO.delete(watch);
             String notice = authdata.username() + "has stopped observing\n";
@@ -222,10 +224,10 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
         GameData game = gameDAO.readGameID(gameID);
 
@@ -236,7 +238,7 @@ public class WSManager extends service.Service {
             game.game().resign();
             gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
         } else {
-            throw new DataAccessException("A non-player tried to resign");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "A non-player tried to resign");
         }
         return new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
     }
@@ -251,10 +253,10 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "something went wrong with authentication");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
         GameData game = gameDAO.readGameID(gameID);
 
@@ -268,7 +270,7 @@ public class WSManager extends service.Service {
             enemycolor = "WHITE";
         }
         if (strcolor == null) {
-            throw new DataAccessException("no turn color, what?");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "no turn color, what?");
         }
         StringBuilder builder = new StringBuilder();
         builder.append("Player ");

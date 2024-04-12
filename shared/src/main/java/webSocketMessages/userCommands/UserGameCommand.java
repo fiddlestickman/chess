@@ -12,26 +12,26 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
+    public UserGameCommand(String authToken) {
+        this.authToken = authToken;
+    }
+
     public UserGameCommand(CommandType type, String authToken, int gameID, ChessMove move) {
         this.commandType = type;
         this.authToken = authToken;
         this.gameID = gameID;
         this.move = move;
-        this.color = null;
     }
     public UserGameCommand(CommandType type, String authToken, int gameID, ChessGame.TeamColor color) {
         this.commandType = type;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.move = null;
         this.color = color;
     }
     public UserGameCommand(CommandType type, String authToken, int gameID) {
         this.commandType = type;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.move = null;
-        this.color = null;
     }
     public enum CommandType {
         JOIN_PLAYER,
@@ -43,9 +43,9 @@ public class UserGameCommand {
 
     protected CommandType commandType;
     private final String authToken;
-    private final int gameID;
-    private final ChessMove move;
-    private final ChessGame.TeamColor color;
+    private int gameID = -1;
+    private ChessMove move = null;
+    private ChessGame.TeamColor color = null;
     public String getAuthString() {
         return authToken;
     }

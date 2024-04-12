@@ -36,12 +36,16 @@ public class WSServer {
             }
             add(auth, session);
             ServerMessage notification = manager.joinPlayerNotify(command);
-            int j = 0;
-            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
                 broadcastOne(session, notification);
                 return;
             }
+
             ServerMessage loadgame = manager.loadGame(command);
+            if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, loadgame);
+                return;
+            }
 
             broadcastOne(session, loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
@@ -53,26 +57,57 @@ public class WSServer {
             }
             add(auth, session);
             ServerMessage notification = manager.joinObserverNotify(command);
+
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+                broadcastOne(session, notification);
+                return;
+            }
             ServerMessage loadgame = manager.loadGame(command);
+            if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, loadgame);
+                return;
+            }
 
             broadcastOne(session, loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
             ServerMessage loadgame = manager.makeMove(command);
+            if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, loadgame);
+                return;
+            }
             ServerMessage notification = manager.makeMoveNotification(command);
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+                broadcastOne(session, notification);
+                return;
+            }
 
             broadcastAll(command.getGameID(), loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
             ServerMessage notification = manager.leave(command);
+
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, notification);
+                return;
+            }
+
             broadcastAllOthers(command.getGameID(), session, notification);
             session.close();
             connections.remove(command.getAuthString());
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
-            ServerMessage loadgame = manager.resign(command);
             ServerMessage notification = manager.resignMessage(command);
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+                broadcastOne(session, notification);
+                return;
+            }
+            ServerMessage loadgame = manager.resign(command);
+            if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, loadgame);
+                return;
+            }
 
             broadcastAll(command.getGameID(), loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
