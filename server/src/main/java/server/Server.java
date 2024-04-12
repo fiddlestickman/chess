@@ -11,6 +11,7 @@ public class Server {
         //location of web assets
         Spark.staticFiles.location("web");
         //do stuff I guess
+        Spark.webSocket("/connect", WSServer.class);
         createRoutes();
 
         Spark.awaitInitialization();
@@ -27,7 +28,6 @@ private static void createRoutes() {
     Spark.get("/sg", (req, res) -> GameHandler.getInstance().getGameRequest(req, res));
     Spark.post("/game", (req, res) -> GameHandler.getInstance().createGameRequest(req, res));
     Spark.put("/game", (req, res) -> GameHandler.getInstance().joinGameRequest(req, res));
-    Spark.webSocket("/connect", WSServer.class);
 }
 public void stop() {
         Spark.stop();

@@ -165,7 +165,7 @@ public class ChessboardUI {
             }
 
             boolean highlight = false;
-            if (positions.contains(new ChessPosition(row, boardCol)))
+            if (positions != null && positions.contains(new ChessPosition(row, boardCol)))
                 highlight = true;
 
             printPlayer(out, piece, color, highlight);

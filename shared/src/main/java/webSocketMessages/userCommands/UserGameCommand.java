@@ -1,5 +1,8 @@
 package webSocketMessages.userCommands;
 
+import chess.ChessGame;
+import chess.ChessMove;
+
 import java.util.Objects;
 
 /**
@@ -9,11 +12,27 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
-
-    public UserGameCommand(String authToken) {
+    public UserGameCommand(CommandType type, String authToken, int gameID, ChessMove move) {
+        this.commandType = type;
         this.authToken = authToken;
+        this.gameID = gameID;
+        this.move = move;
+        this.color = null;
     }
-
+    public UserGameCommand(CommandType type, String authToken, int gameID, ChessGame.TeamColor color) {
+        this.commandType = type;
+        this.authToken = authToken;
+        this.gameID = gameID;
+        this.move = null;
+        this.color = color;
+    }
+    public UserGameCommand(CommandType type, String authToken, int gameID) {
+        this.commandType = type;
+        this.authToken = authToken;
+        this.gameID = gameID;
+        this.move = null;
+        this.color = null;
+    }
     public enum CommandType {
         JOIN_PLAYER,
         JOIN_OBSERVER,
@@ -23,13 +42,16 @@ public class UserGameCommand {
     }
 
     protected CommandType commandType;
-
     private final String authToken;
-
+    private final int gameID;
+    private final ChessMove move;
+    private final ChessGame.TeamColor color;
     public String getAuthString() {
         return authToken;
     }
-
+    public int getGameID() {return gameID;}
+    public ChessMove getMove() {return move;}
+    public ChessGame.TeamColor getColor() {return color;}
     public CommandType getCommandType() {
         return this.commandType;
     }

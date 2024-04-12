@@ -28,7 +28,9 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
 
 
     public int create(WatchData w) throws DataAccessException {
-        return 0;
+        var statement = "INSERT INTO watch (gameID, username) VALUES (?, ?)";
+        var id = executeUpdate(statement, w.gameID(), w.username());
+        return id;
     }
 
     public Collection<WatchData> readGameID(int gameID) throws DataAccessException {
@@ -52,7 +54,7 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
 
     public WatchData findWatch(String username, int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID FROM watch WHERE username=? gameID=?";
+            var statement = "SELECT FROM watch WHERE username=? gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 ps.setInt(2, gameID);

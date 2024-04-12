@@ -6,14 +6,12 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import ui.ChessboardUI;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
@@ -26,30 +24,33 @@ public class GameplayMenu extends Endpoint {
     private final String auth;
     private final int gameID;
     private final ChessGame.TeamColor color;
-    private ServerFacade facade;
     private ChessGame game;
 
     public GameplayMenu(String auth, String portNum, int gameID, ChessGame.TeamColor color) throws Exception {
         this.auth = auth;
         this.gameID = gameID;
         this.color = color;
-        String url = "http://localhost:" + portNum;
-        facade = new ServerFacade(url, auth);
         String gameUrl = "ws://localhost:" + portNum + "/connect";
         URI uri = new URI(gameUrl);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
-
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 handleInput(message);
             }
         });
 
-        send(serialize(new JoinPlayerCommand(auth, gameID, color)));
+        if (color != null) {
+            send(serialize(new UserGameCommand(UserGameCommand.CommandType.JOIN_PLAYER, auth, gameID, color)));
+        } else {
+            send(serialize(new UserGameCommand(UserGameCommand.CommandType.JOIN_OBSERVER, auth, gameID)));
+        }
     }
 
     public String gameLoop() throws Exception{
+        if (color == null) {
+            return ObserveLoop();
+        }
         //get input here
         String input = getString("[Do a thing]>>> ");
         input = input.toLowerCase();
@@ -63,7 +64,7 @@ public class GameplayMenu extends Endpoint {
             return "keep looping";
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "redraw board")) {
-            if (color == null || color == ChessGame.TeamColor.WHITE) {
+            if (color == ChessGame.TeamColor.WHITE) {
                 ChessboardUI.PrintWhite();
             } else if (color == ChessGame.TeamColor.BLACK) {
                 ChessboardUI.PrintBlack();
@@ -71,7 +72,7 @@ public class GameplayMenu extends Endpoint {
             return "keep looping";
         }
         else if (Objects.equals(input, "3") || Objects.equals(input, "leave")) {
-            LeaveCommand command = new LeaveCommand(auth, gameID);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, gameID);
             send(serialize(command));
             System.out.println("Leaving game (anyone can join)");
             return "stop looping";
@@ -85,13 +86,13 @@ public class GameplayMenu extends Endpoint {
             Collection<ChessMove> legalmoves = game.validMoves(move.getStartPosition());
 
             if (legalmoves.contains(move)) {
-                MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move);
+                UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, auth, gameID, move);
             } else {
                 System.out.println("That move is not legal (try highlighting legal moves)");
             }
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "resign")) {
-            ResignCommand command = new ResignCommand(auth, gameID);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, gameID);
             send(serialize(command));
             System.out.println("Resigning...");
             return "stop looping";
@@ -118,7 +119,7 @@ public class GameplayMenu extends Endpoint {
         String input = getString("[Observing]>>> ");
         input = input.toLowerCase();
         if (input.equals("quit")) {
-            LeaveCommand command = new LeaveCommand(auth, gameID);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, gameID);
             send(serialize(command));
             System.out.println("Leaving game...");
             return "stop looping";
@@ -234,13 +235,13 @@ public class GameplayMenu extends Endpoint {
                 while (promo == null) {
                     String getpromo = getString("What promotion?");
                     getpromo = getpromo.toLowerCase();
-                    if (getpromo == "q" || getpromo == "queen") {
+                    if (getpromo.equals("q") || getpromo.equals("queen")) {
                         promo = ChessPiece.PieceType.QUEEN;
-                    } else if (getpromo == "r" || getpromo == "rook") {
+                    } else if (getpromo.equals("r") || getpromo.equals("rook")) {
                         promo = ChessPiece.PieceType.ROOK;
-                    } else if (getpromo == "k" || getpromo == "knight") {
+                    } else if (getpromo.equals("k") || getpromo.equals("knight")) {
                         promo = ChessPiece.PieceType.KNIGHT;
-                    } else if (getpromo == "b" || getpromo == "bishop") {
+                    } else if (getpromo.equals("b") || getpromo.equals("bishop")) {
                         promo = ChessPiece.PieceType.BISHOP;
                     } else {
                         System.out.println("Input not understood (please type q/r/k/b)\n");

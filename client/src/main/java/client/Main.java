@@ -12,7 +12,7 @@ public class Main {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         // Specify the desired endpoint
-        String portNum = "8080";
+        String portNum = "3310";
         if (args.length == 1) {
             portNum = args[0];
         }
@@ -30,7 +30,7 @@ public class Main {
                 loop = false;
             }
             else {
-                pregame(out, serverUrl);
+                pregame(out, portNum);
             }
         }
     }
@@ -44,6 +44,18 @@ public class Main {
             if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
             else if (Objects.equals(out, "stop looping")) {
                 loop = false;
+            } else if (out != null) {
+                String[] data = out.split(" ", 2);
+                int gameID = Integer.parseInt(data[0]);
+                ChessGame.TeamColor color = null;
+                if (Objects.equals(data[1], "w"))
+                    color = ChessGame.TeamColor.WHITE;
+                else if (Objects.equals(data[1], "b"))
+                    color = ChessGame.TeamColor.BLACK;
+                else if (!Objects.equals(data[1], "n")) {
+                    //error handling
+                }
+                gameplay(auth, portNum, gameID, color);
             }
             else {
                 loop = false;
@@ -54,19 +66,18 @@ public class Main {
     private static void gameplay (String auth, String portNum, int gameID, ChessGame.TeamColor color) {
         try {
             GameplayMenu game = new GameplayMenu(auth, portNum, gameID, color);
-        boolean loop = true;
+            boolean loop = true;
 
-        while (loop) {
-            String out = game.gameLoop();
-            if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
-            else if (Objects.equals(out, "stop looping")) {
-                loop = false;
+            while (loop) {
+                String out = game.gameLoop();
+                if (Objects.equals(out, "keep looping")) {} //do nothing, keep looping
+                else if (Objects.equals(out, "stop looping")) {
+                    loop = false;
+                }
+                else {
+                    loop = false;
+                }
             }
-            else {
-                loop = false;
-            }
-        }
-
         } catch (Exception e) {
             //error handling
         }

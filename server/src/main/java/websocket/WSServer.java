@@ -34,44 +34,39 @@ public class WSServer {
 
         UserGameCommand command = (UserGameCommand) handler.deserialize(message, UserGameCommand.class);
         if (command.getCommandType() == UserGameCommand.CommandType.JOIN_PLAYER) {
-            JoinPlayerCommand join = (JoinPlayerCommand) command;
-            NotificationMessage notification = manager.joinPlayerNotify(join);
-            LoadGameMessage loadgame = manager.loadGame(join);
+            NotificationMessage notification = manager.joinPlayerNotify(command);
+            LoadGameMessage loadgame = manager.loadGame(command);
 
             broadcastOne(session, loadgame);
-            broadcastAllOthers(join.getGameID(), session, notification);
+            broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.JOIN_OBSERVER) {
-            JoinObserverCommand join = (JoinObserverCommand) command;
-            NotificationMessage notification = manager.joinObserverNotify(join);
-            LoadGameMessage loadgame = manager.loadGame(join);
+            NotificationMessage notification = manager.joinObserverNotify(command);
+            LoadGameMessage loadgame = manager.loadGame(command);
 
             broadcastOne(session, loadgame);
-            broadcastAllOthers(join.getGameID(), session, notification);
+            broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
-            MakeMoveCommand move = (MakeMoveCommand) command;
-            LoadGameMessage loadgame = manager.makeMove(move);
-            NotificationMessage notification = manager.makeMoveNotification(move);
+            LoadGameMessage loadgame = manager.makeMove(command);
+            NotificationMessage notification = manager.makeMoveNotification(command);
 
-            broadcastAll(move.getGameID(), loadgame);
-            broadcastAllOthers(move.getGameID(), session, notification);
+            broadcastAll(command.getGameID(), loadgame);
+            broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
-            LeaveCommand leave = (LeaveCommand) command;
-            NotificationMessage notification = manager.leave(leave);
-            String username = manager.getLeave(leave);
+            NotificationMessage notification = manager.leave(command);
+            String username = manager.getLeave(command);
 
-            broadcastAllOthers(leave.getGameID(), session, notification);
+            broadcastAllOthers(command.getGameID(), session, notification);
             session.close();
             connections.remove(username);
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
-            ResignCommand resign = (ResignCommand) command;
-            LoadGameMessage loadgame = manager.resign(resign);
-            NotificationMessage notification = manager.resignMessage(resign);
+            LoadGameMessage loadgame = manager.resign(command);
+            NotificationMessage notification = manager.resignMessage(command);
 
-            broadcastAll(resign.getGameID(), loadgame);
-            broadcastAllOthers(resign.getGameID(), session, notification);
+            broadcastAll(command.getGameID(), loadgame);
+            broadcastAllOthers(command.getGameID(), session, notification);
         }
     }
 

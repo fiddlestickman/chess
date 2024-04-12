@@ -66,36 +66,22 @@ public class PregameMenu {
             String team = getString("Please enter a team color to play as (white/black): ");
             ChessGame.TeamColor color = null;
             if (team.equals("white") || team.equals("w")){
+                team = "w";
                 color = ChessGame.TeamColor.WHITE;
-            } else if (team.equals("black") || team.equals("b"))
+            } else if (team.equals("black") || team.equals("b")) {
+                team = "b";
                 color = ChessGame.TeamColor.BLACK;
-            else {
+            } else {
                 System.out.print("Did not understand input\n");
                 return "keep looping";
             }
-            int gameID = Integer.parseInt(id);
-            Main.JoinResponse out = facade.joinGame(gameID, color);
-            if (out != null && out.playerColor != null) {
-                System.out.printf("Joined game on the %s team.%n", out.playerColor);
-                PrintWhite();
-                PrintBlack();
-            } else {
-                //error handling
-            }
-            return "keep looping";
+            System.out.print("Joining game...\n");
+            return id + " " + team;
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "join observer")) {
             String id = getString("Please enter a game ID: ");
-            int gameID = Integer.parseInt(id);
-            Main.JoinResponse out = facade.joinGame(gameID, null);
-            if (out != null){
-                System.out.print("Joined game as an observer\n");
-                PrintWhite();
-                PrintBlack();
-            } else {
-                //error handling
-            }
-            return "keep looping";
+            System.out.print("Joining game as an observer...\n");
+            return id + " n";
         }
         else if (Objects.equals(input, "6") || Objects.equals(input, "logout")) {
             System.out.print("Logging out...\n");

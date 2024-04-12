@@ -27,7 +27,7 @@ public class WSManager {
     public WSManager () {
     }
 
-    public NotificationMessage joinPlayerNotify(JoinPlayerCommand command) throws DataAccessException {
+    public NotificationMessage joinPlayerNotify(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         ChessGame.TeamColor color = command.getColor();
         String auth = command.getAuthString();
@@ -69,7 +69,7 @@ public class WSManager {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
 
-    public NotificationMessage joinObserverNotify(JoinObserverCommand command) throws DataAccessException {
+    public NotificationMessage joinObserverNotify(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
 
@@ -97,17 +97,7 @@ public class WSManager {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
 
-    public LoadGameMessage loadGame(JoinPlayerCommand command) throws DataAccessException {
-        int gameID = command.getGameID();
-        GameDAO gameDAO = SQLGameDAO.getInstance();
-        GameData gamedata = gameDAO.readGameID(gameID);
-
-        if (gamedata == null) {
-            throw new DataAccessException("No game found with given gameID");
-        }
-        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
-    }
-    public LoadGameMessage loadGame(JoinObserverCommand command) throws DataAccessException {
+    public LoadGameMessage loadGame(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         GameDAO gameDAO = SQLGameDAO.getInstance();
         GameData gamedata = gameDAO.readGameID(gameID);
@@ -118,8 +108,7 @@ public class WSManager {
         return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
     }
 
-
-    public LoadGameMessage makeMove(MakeMoveCommand command) throws DataAccessException {
+    public LoadGameMessage makeMove(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
@@ -143,7 +132,7 @@ public class WSManager {
         return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
 
     }
-    public NotificationMessage makeMoveNotification(MakeMoveCommand command) throws DataAccessException {
+    public NotificationMessage makeMoveNotification(UserGameCommand command) throws DataAccessException {
         String auth = command.getAuthString();
         AuthDAO authDAO = SQLAuthDAO.getInstance();
         GameDAO gameDAO = SQLGameDAO.getInstance();
@@ -186,7 +175,7 @@ public class WSManager {
     }
 
 
-    public NotificationMessage leave(LeaveCommand command) throws DataAccessException {
+    public NotificationMessage leave(UserGameCommand command) throws DataAccessException {
         String auth = command.getAuthString();
         int gameID = command.getGameID();
 
@@ -219,7 +208,7 @@ public class WSManager {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
     }
 
-    public String getLeave(LeaveCommand command) throws DataAccessException {
+    public String getLeave(UserGameCommand command) throws DataAccessException {
         String auth = command.getAuthString();
         AuthDAO authDAO = SQLAuthDAO.getInstance();
         AuthData authdata = authDAO.readAuth(auth);
@@ -229,7 +218,7 @@ public class WSManager {
         return authdata.username();
     }
 
-    public LoadGameMessage resign(ResignCommand command) throws DataAccessException {
+    public LoadGameMessage resign(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
 
@@ -254,7 +243,7 @@ public class WSManager {
         return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
     }
 
-    public NotificationMessage resignMessage(ResignCommand command) throws DataAccessException {
+    public NotificationMessage resignMessage(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
 
