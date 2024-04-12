@@ -81,7 +81,7 @@ public class WSManager {
             throw new DataAccessException("Authtoken was wrong");
         }
 
-        WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
+        WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
 
         if (watch == null) {
             throw new DataAccessException("No watcher with that authtoken found");
@@ -194,7 +194,7 @@ public class WSManager {
         } else if (Objects.equals(authdata.username(), game.blackUsername())) {
             gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game()));
         } else {
-            WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
+            WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
             if (watch == null) {
                 throw new DataAccessException("A non-player, non-observer tried to leave the game");
             }
@@ -206,16 +206,6 @@ public class WSManager {
         String notice = authdata.username() + " has left the game\n";
 
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
-    }
-
-    public String getLeave(UserGameCommand command) throws DataAccessException {
-        String auth = command.getAuthString();
-        AuthDAO authDAO = SQLAuthDAO.getInstance();
-        AuthData authdata = authDAO.readAuth(auth);
-        if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
-        }
-        return authdata.username();
     }
 
     public LoadGameMessage resign(UserGameCommand command) throws DataAccessException {

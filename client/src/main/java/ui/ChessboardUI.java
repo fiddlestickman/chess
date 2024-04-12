@@ -21,12 +21,10 @@ public class ChessboardUI {
     private static String[] blackrows = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
 
-    public static void PrintWhite() {
+    public static void PrintWhite(ChessBoard board) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
 
         drawHeaders(out, true);
         drawChessboard(out, true, board, null);
@@ -36,12 +34,10 @@ public class ChessboardUI {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void PrintBlack() {
+    public static void PrintBlack(ChessBoard board) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
 
         drawHeaders(out, false);
         drawChessboard(out, false, board, null);
@@ -51,7 +47,7 @@ public class ChessboardUI {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void PrintWhiteHighlight(Collection<ChessMove> moves) {
+    public static void PrintWhiteHighlight(ChessBoard board, Collection<ChessMove> moves) {
 
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         ArrayList<ChessPosition> positions = new ArrayList<>();
@@ -61,8 +57,6 @@ public class ChessboardUI {
             positions.add(next.getEndPosition());
         }
         out.print(ERASE_SCREEN);
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
 
         drawHeaders(out, true);
         drawChessboard(out, true, board, positions);
@@ -72,7 +66,7 @@ public class ChessboardUI {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void PrintBlackHighlight(Collection<ChessMove> moves) {
+    public static void PrintBlackHighlight(ChessBoard board, Collection<ChessMove> moves) {
 
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         ArrayList<ChessPosition> positions = new ArrayList<>();
@@ -82,8 +76,6 @@ public class ChessboardUI {
             positions.add(next.getEndPosition());
         }
         out.print(ERASE_SCREEN);
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
 
         drawHeaders(out, false);
         drawChessboard(out, false, board, positions);
@@ -159,9 +151,9 @@ public class ChessboardUI {
             out.print(EMPTY.repeat(prefixLength));
             String piece;
             if (white) {
-                piece = getPiece(out, board, 8-row, 8-boardCol);
+                piece = getPiece(out, board, 8-row, boardCol+1);
             } else {
-                piece = getPiece(out, board, row+1, boardCol+1);
+                piece = getPiece(out, board, row+1, 8-boardCol);
             }
 
             boolean highlight = false;

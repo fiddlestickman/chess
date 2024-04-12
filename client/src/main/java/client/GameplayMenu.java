@@ -52,7 +52,7 @@ public class GameplayMenu extends Endpoint {
             return ObserveLoop();
         }
         //get input here
-        String input = getString("[Do a thing]>>> ");
+        String input = getString("[Do a thing]>>> \n");
         input = input.toLowerCase();
         if (Objects.equals(input, "1") || Objects.equals(input, "help")) {
             System.out.printf("%d. %s - Explains the different options available%n", 1, gameOptions[0]);
@@ -65,9 +65,9 @@ public class GameplayMenu extends Endpoint {
         }
         else if (Objects.equals(input, "2") || Objects.equals(input, "redraw board")) {
             if (color == ChessGame.TeamColor.WHITE) {
-                ChessboardUI.PrintWhite();
+                ChessboardUI.PrintWhite(game.getBoard());
             } else if (color == ChessGame.TeamColor.BLACK) {
-                ChessboardUI.PrintBlack();
+                ChessboardUI.PrintBlack(game.getBoard());
             }
             return "keep looping";
         }
@@ -87,6 +87,7 @@ public class GameplayMenu extends Endpoint {
 
             if (legalmoves.contains(move)) {
                 UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, auth, gameID, move);
+                send(serialize(command));
             } else {
                 System.out.println("That move is not legal (try highlighting legal moves)");
             }
@@ -106,9 +107,9 @@ public class GameplayMenu extends Endpoint {
             }
             Collection<ChessMove> moves = game.validMoves(pos);
             if (color == null || color == ChessGame.TeamColor.WHITE) {
-                ChessboardUI.PrintWhiteHighlight(moves);
+                ChessboardUI.PrintWhiteHighlight(game.getBoard(), moves);
             } else if (color == ChessGame.TeamColor.BLACK) {
-                ChessboardUI.PrintBlackHighlight(moves);
+                ChessboardUI.PrintBlackHighlight(game.getBoard(), moves);
             }
             return "keep looping";
         }
@@ -116,7 +117,7 @@ public class GameplayMenu extends Endpoint {
     }
 
     public String ObserveLoop() throws Exception {
-        String input = getString("[Observing]>>> ");
+        String input = getString("[Observing]>>> \n");
         input = input.toLowerCase();
         if (input.equals("quit")) {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, gameID);
@@ -127,9 +128,9 @@ public class GameplayMenu extends Endpoint {
             String strcolor = getString("Which perspective? (b/w))");
             strcolor = strcolor.toLowerCase();
             if (strcolor.equals("w") || strcolor.equals("white")) {
-                ChessboardUI.PrintWhite();
+                ChessboardUI.PrintWhite(game.getBoard());
             } else if (strcolor.equals("b") || strcolor.equals("black")) {
-                ChessboardUI.PrintBlack();
+                ChessboardUI.PrintBlack(game.getBoard());
             }
             return "keep looping";
         } else {
@@ -140,6 +141,7 @@ public class GameplayMenu extends Endpoint {
 
     public void send(String msg) throws Exception {
         this.session.getBasicRemote().sendText(msg);
+
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
@@ -163,10 +165,14 @@ public class GameplayMenu extends Endpoint {
     private void loadGame(LoadGameMessage message){
         this.game = message.getGame();
         if (color == null || color == ChessGame.TeamColor.WHITE) {
-            ChessboardUI.PrintWhite();
+            ChessboardUI.PrintWhite(game.getBoard());
         } else if (color == ChessGame.TeamColor.BLACK) {
-            ChessboardUI.PrintBlack();
+            ChessboardUI.PrintBlack(game.getBoard());
         }
+        if (color == null)
+            System.out.print("[Observing]>>> ");
+        else
+            System.out.print("[Do a thing]>>> ");
     }
 
     private void notify(NotificationMessage message){
@@ -225,11 +231,24 @@ public class GameplayMenu extends Endpoint {
     }
 
     private ChessMove getMove() {
-        String strpos = getString("Type the piece move");
-        String[] temp = strpos.split(" ");
+        String strmove = getString("Type the piece move: ");
+        String[] temp;
+        if (strmove.contains(" ")) {
+            temp = strmove.split(" ");
+        } else {
+            System.out.println("Input not understood (please type like so: a3 a4)\n");
+            return null;
+        }
         ChessPosition start = getPos(temp[0]);
         ChessPosition end = getPos(temp[1]);
+        if (start == null || end == null) {
+            System.out.println("Input not understood (please type like so: a3 a4)\n");
+            return null;
+        } else if (game.getBoard().getPiece(start) == null || game.getBoard().getPiece(start).getTeamColor() != color) {
+            System.out.println("Please choose one of your pieces on the board\n");
+        }
         ChessPiece.PieceType promo = null;
+
         if (game.getBoard().getPiece(start).getPieceType() == ChessPiece.PieceType.PAWN) {
             if (end.getRow() == 1 || end.getRow() == 8) {
                 while (promo == null) {

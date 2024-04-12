@@ -76,11 +76,13 @@ public class PregameMenu {
                 return "keep looping";
             }
             System.out.print("Joining game...\n");
+            facade.joinGame(Integer.parseInt(id), color);
             return id + " " + team;
         }
         else if (Objects.equals(input, "5") || Objects.equals(input, "join observer")) {
             String id = getString("Please enter a game ID: ");
             System.out.print("Joining game as an observer...\n");
+            facade.joinGame(Integer.parseInt(id), null);
             return id + " n";
         }
         else if (Objects.equals(input, "6") || Objects.equals(input, "logout")) {

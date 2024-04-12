@@ -39,7 +39,7 @@ public class GameService extends Service {
             gameDAO.update(newgame);
         }
         else {
-            WatchData newwatch = new WatchData(auth.username(), game.gameID());
+            WatchData newwatch = new WatchData(auth.authToken(), game.gameID());
             WatchDAO watchDAO = SQLWatchDAO.getInstance();
             watchDAO.create(newwatch);
         }

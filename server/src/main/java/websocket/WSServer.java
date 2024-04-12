@@ -14,12 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
 public class WSServer {
-
-    private ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();;
+    private ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
     @OnWebSocketConnect
-    public void onConnect(Session session) throws Exception {
-        //do something after creating a new websocket connection
+    public void onConnect(Session session) {
     }
 
     @OnWebSocketClose
@@ -34,6 +32,7 @@ public class WSServer {
 
         UserGameCommand command = (UserGameCommand) handler.deserialize(message, UserGameCommand.class);
         if (command.getCommandType() == UserGameCommand.CommandType.JOIN_PLAYER) {
+            add(command.getAuthString(), session);
             NotificationMessage notification = manager.joinPlayerNotify(command);
             LoadGameMessage loadgame = manager.loadGame(command);
 
@@ -41,6 +40,7 @@ public class WSServer {
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.JOIN_OBSERVER) {
+            add(command.getAuthString(), session);
             NotificationMessage notification = manager.joinObserverNotify(command);
             LoadGameMessage loadgame = manager.loadGame(command);
 
@@ -56,11 +56,9 @@ public class WSServer {
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
             NotificationMessage notification = manager.leave(command);
-            String username = manager.getLeave(command);
-
             broadcastAllOthers(command.getGameID(), session, notification);
             session.close();
-            connections.remove(username);
+            connections.remove(command.getAuthString());
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             LoadGameMessage loadgame = manager.resign(command);
             NotificationMessage notification = manager.resignMessage(command);
@@ -70,72 +68,44 @@ public class WSServer {
         }
     }
 
-    public void add(String username, Session session) {
-        Connection connection = new Connection(username, session);
-        connections.put(username, connection);
+    public void add(String auth, Session session) {
+        Connection connection = new Connection(auth, session);
+        connections.put(auth, connection);
     }
 
-    public void remove(String username) {
-        connections.remove(username);
+    public void remove(String auth) {
+        connections.remove(auth);
     }
 
     public void broadcastAll(int gameID, ServerMessage message) {
         //send the message to each client
-
-        ArrayList<String> users;
         WSService service = new WSService();
-        try {
-            users = service.getUsers(gameID); //these are all the users, both watching and playing
-        } catch (Exception e) {
-            //error handling
-            return;
-        }
-
-        Iterator<String> iter = users.iterator();
-
-        while(iter.hasNext()) {
-            String next = iter.next();
-            Connection connection = connections.get(next);
+        connections.forEach(12, (k, v) -> {
             try {
-                if (connection.getSession().isOpen()) {
-                    connection.getSession().getRemote().sendString(serialize(message));
+                if (v.getSession().isOpen()) {
+                    v.getSession().getRemote().sendString(serialize(message));
                 } else {
-                    service.delete(next, gameID);
+                    service.delete(k, gameID);
                 }
             } catch (Exception e) {
                 //error handling
             }
-        }
-
+        });
     }
     public void broadcastAllOthers(int gameID, Session session, ServerMessage message) {
-
-        ArrayList<String> users;
+        //send the message to each client
         WSService service = new WSService();
-        try {
-            users = service.getUsers(gameID); //these are all the users, both watching and playing
-        } catch (Exception e) {
-            //error handling
-            return;
-        }
-
-        Iterator<String> iter = users.iterator();
-
-        while(iter.hasNext()) {
-            String next = iter.next();
-            Connection connection = connections.get(next);
-            if (!connection.session.equals(session)) {
-                try {
-                    if (connection.getSession().isOpen()) {
-                        connection.getSession().getRemote().sendString(serialize(message));
-                    } else {
-                        service.delete(next, gameID);
-                    }
-                } catch (Exception e) {
-                    //error handling
+        connections.forEach(12, (k, v) -> {
+            try {
+                if (v.getSession().isOpen() && v.getSession() != session) {
+                    v.getSession().getRemote().sendString(serialize(message));
+                } else {
+                    service.delete(k, gameID);
                 }
+            } catch (Exception e) {
+                //error handling
             }
-        }
+        });
     }
 
     public void broadcastOne(Session session, ServerMessage message) {
@@ -156,16 +126,16 @@ public class WSServer {
         return gson.toJson(thing);
     }
 
-    private class Connection {
-        private String username;
+    public class Connection {
+        private String auth;
         private Session session;
 
-        Connection(String username, Session session) {
-            this.username = username;
+        Connection(String auth, Session session) {
+            this.auth = auth;
             this.session = session;
         }
-        String getUsername() {
-            return username;
+        String getAuth() {
+            return auth;
         }
         Session getSession() {
             return session;

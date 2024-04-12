@@ -28,15 +28,15 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
 
 
     public int create(WatchData w) throws DataAccessException {
-        var statement = "INSERT INTO watch (gameID, username) VALUES (?, ?)";
-        var id = executeUpdate(statement, w.gameID(), w.username());
+        var statement = "INSERT INTO watch (gameID, authToken) VALUES (?, ?)";
+        var id = executeUpdate(statement, w.gameID(), w.auth());
         return id;
     }
 
     public Collection<WatchData> readGameID(int gameID) throws DataAccessException {
         var result = new ArrayList<WatchData>();
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT watchID, username, gameID FROM watch WHERE gameID=?";
+            var statement = "SELECT watchID, authToken, gameID FROM watch WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -52,15 +52,16 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
     }
 
 
-    public WatchData findWatch(String username, int gameID) throws DataAccessException {
+    public WatchData findWatch(String auth, int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT FROM watch WHERE username=? gameID=?";
+            var statement = "SELECT watchID, gameID, authToken FROM watch WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
-                ps.setInt(2, gameID);
+                ps.setString(1, auth);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return readWatch(rs);
+                    while (rs.next()) {
+                        if(rs.getInt("gameID") == gameID) {
+                            return readWatch(rs);
+                        }
                     }
                 }
             }
@@ -71,8 +72,8 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
     }
 
     public void delete(WatchData w) throws DataAccessException {
-        var statement = "DELETE FROM auth WHERE username=?";
-        executeUpdate(statement, w.username());
+        var statement = "DELETE FROM watch WHERE authToken=?";
+        executeUpdate(statement, w.auth());
     }
 
     public void clear() throws DataAccessException {
@@ -81,10 +82,10 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
     }
 
     private WatchData readWatch(ResultSet rs) throws SQLException {
-        var username = rs.getString("username");
+        var auth = rs.getString("authToken");
         var gameID = rs.getInt("gameID");
 
-        return new WatchData(username, gameID);
+        return new WatchData(auth, gameID);
     }
 }
 

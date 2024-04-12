@@ -3,6 +3,8 @@ package server;
 import spark.*;
 import websocket.WSServer;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Server {
 
     public int run(int desiredPort) {
