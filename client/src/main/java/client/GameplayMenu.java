@@ -151,9 +151,9 @@ public class GameplayMenu extends Endpoint {
         try {
             ServerMessage message = deserialize(json);
             if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                loadGame((LoadGameMessage) message);
+                loadGame(message);
             } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                notify((NotificationMessage) message);
+                notify(message);
             } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
                 //error handling
             }
@@ -162,7 +162,7 @@ public class GameplayMenu extends Endpoint {
         }
     }
 
-    private void loadGame(LoadGameMessage message){
+    private void loadGame(ServerMessage message){
         this.game = message.getGame();
         if (color == null || color == ChessGame.TeamColor.WHITE) {
             ChessboardUI.PrintWhite(game.getBoard());
@@ -175,7 +175,7 @@ public class GameplayMenu extends Endpoint {
             System.out.print("[Do a thing]>>> ");
     }
 
-    private void notify(NotificationMessage message){
+    private void notify(ServerMessage message){
         System.out.println(message.getMessage());
     }
 
@@ -184,16 +184,7 @@ public class GameplayMenu extends Endpoint {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
-        ServerMessage temp = gson.fromJson(body, ServerMessage.class);
-        if (temp.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            return gson.fromJson(body, LoadGameMessage.class);
-        } else if (temp.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            return gson.fromJson(body, NotificationMessage.class);
-        } else if (temp.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            return gson.fromJson(body, ErrorMessage.class);
-        } else {
-            throw new RequestException("there's no message type, what?", 500);
-        }
+        return gson.fromJson(body, ServerMessage.class);
     }
 
     private String serialize (Object thing) {

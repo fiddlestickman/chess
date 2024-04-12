@@ -15,7 +15,7 @@ public class WSManager extends service.Service {
     public WSManager () {
     }
 
-    public NotificationMessage joinPlayerNotify(UserGameCommand command) throws DataAccessException {
+    public ServerMessage joinPlayerNotify(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         ChessGame.TeamColor color = command.getColor();
         String auth = command.getAuthString();
@@ -25,27 +25,25 @@ public class WSManager extends service.Service {
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
-            throw new DataAccessException("something went wrong with authentication");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Bad authtoken");
         }
         if(authdata == null) {
-            throw new DataAccessException("Authtoken was wrong");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Bad authtoken");
         }
 
         GameData gamedata = gameDAO.readGameID(gameID);
+        if (gamedata == null) {
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "No game with that ID found");
+        }
+
         String strcolor = "";
 
-        if (color == ChessGame.TeamColor.WHITE) {
+        if (Objects.equals(gamedata.whiteUsername(), authdata.username())) {
             strcolor = "white";
-            if (!Objects.equals(gamedata.whiteUsername(), authdata.username())) {
-                throw new DataAccessException("authtoken didn't match white player");
-            }
-        } else if (color == ChessGame.TeamColor.BLACK) {
+        } else if (Objects.equals(gamedata.blackUsername(), authdata.username())) {
             strcolor = "black";
-            if (!Objects.equals(gamedata.blackUsername(), authdata.username())) {
-                throw new DataAccessException("authtoken didn't match black player");
-            }
         } else {
-            //throw new DataAccessException("No color in join player command");
+            return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Username did not match either player");
         }
 
         StringBuilder builder = new StringBuilder();
@@ -57,10 +55,10 @@ public class WSManager extends service.Service {
 
         String join = builder.toString();
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
+        return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
 
-    public NotificationMessage joinObserverNotify(UserGameCommand command) throws DataAccessException {
+    public ServerMessage joinObserverNotify(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
 
@@ -89,10 +87,10 @@ public class WSManager extends service.Service {
 
         String join = builder.toString();
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
+        return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
 
-    public LoadGameMessage loadGame(UserGameCommand command) throws DataAccessException {
+    public ServerMessage loadGame(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         GameDAO gameDAO = SQLGameDAO.getInstance();
         GameData gamedata = gameDAO.readGameID(gameID);
@@ -100,10 +98,10 @@ public class WSManager extends service.Service {
         if (gamedata == null) {
             throw new DataAccessException("No game found with given gameID");
         }
-        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
+        return new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
     }
 
-    public LoadGameMessage makeMove(UserGameCommand command) throws DataAccessException {
+    public ServerMessage makeMove(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
@@ -128,10 +126,10 @@ public class WSManager extends service.Service {
         }
 
         gameDAO.update(gamedata);
-        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
+        return new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gamedata.game());
 
     }
-    public NotificationMessage makeMoveNotification(UserGameCommand command) throws DataAccessException {
+    public ServerMessage makeMoveNotification(UserGameCommand command) throws DataAccessException {
         String auth = command.getAuthString();
         GameDAO gameDAO = SQLGameDAO.getInstance();
 
@@ -174,11 +172,11 @@ public class WSManager extends service.Service {
         builder.append(files.charAt(end.getColumn()));
         builder.append(end.getRow());
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, builder.toString());
+        return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, builder.toString());
     }
 
 
-    public NotificationMessage leave(UserGameCommand command) throws DataAccessException {
+    public ServerMessage leave(UserGameCommand command) throws DataAccessException {
         String auth = command.getAuthString();
         int gameID = command.getGameID();
 
@@ -207,15 +205,15 @@ public class WSManager extends service.Service {
             }
             watchDAO.delete(watch);
             String notice = authdata.username() + "has stopped observing\n";
-            return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
+            return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
         }
 
         String notice = authdata.username() + " has left the game\n";
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
+        return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
     }
 
-    public LoadGameMessage resign(UserGameCommand command) throws DataAccessException {
+    public ServerMessage resign(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         GameDAO gameDAO = SQLGameDAO.getInstance();
@@ -240,10 +238,10 @@ public class WSManager extends service.Service {
         } else {
             throw new DataAccessException("A non-player tried to resign");
         }
-        return new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
+        return new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
     }
 
-    public NotificationMessage resignMessage(UserGameCommand command) throws DataAccessException {
+    public ServerMessage resignMessage(UserGameCommand command) throws DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
 
@@ -283,7 +281,7 @@ public class WSManager extends service.Service {
 
         String join = builder.toString();
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
+        return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, join);
     }
 
     public void delete(String auth, int gameID) throws DataAccessException {

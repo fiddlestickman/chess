@@ -35,8 +35,13 @@ public class WSServer {
                 auth = auth.substring(1, 21);
             }
             add(auth, session);
-            NotificationMessage notification = manager.joinPlayerNotify(command);
-            LoadGameMessage loadgame = manager.loadGame(command);
+            ServerMessage notification = manager.joinPlayerNotify(command);
+            int j = 0;
+            if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                broadcastOne(session, notification);
+                return;
+            }
+            ServerMessage loadgame = manager.loadGame(command);
 
             broadcastOne(session, loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
@@ -47,27 +52,27 @@ public class WSServer {
                 auth = auth.substring(1, 21);
             }
             add(auth, session);
-            NotificationMessage notification = manager.joinObserverNotify(command);
-            LoadGameMessage loadgame = manager.loadGame(command);
+            ServerMessage notification = manager.joinObserverNotify(command);
+            ServerMessage loadgame = manager.loadGame(command);
 
             broadcastOne(session, loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
-            LoadGameMessage loadgame = manager.makeMove(command);
-            NotificationMessage notification = manager.makeMoveNotification(command);
+            ServerMessage loadgame = manager.makeMove(command);
+            ServerMessage notification = manager.makeMoveNotification(command);
 
             broadcastAll(command.getGameID(), loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
-            NotificationMessage notification = manager.leave(command);
+            ServerMessage notification = manager.leave(command);
             broadcastAllOthers(command.getGameID(), session, notification);
             session.close();
             connections.remove(command.getAuthString());
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
-            LoadGameMessage loadgame = manager.resign(command);
-            NotificationMessage notification = manager.resignMessage(command);
+            ServerMessage loadgame = manager.resign(command);
+            ServerMessage notification = manager.resignMessage(command);
 
             broadcastAll(command.getGameID(), loadgame);
             broadcastAllOthers(command.getGameID(), session, notification);
