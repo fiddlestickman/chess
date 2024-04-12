@@ -106,7 +106,7 @@ public class GameplayMenu extends Endpoint {
                 return "keep looping";
             }
             Collection<ChessMove> moves = game.validMoves(pos);
-            if (color == null || color == ChessGame.TeamColor.WHITE) {
+            if (color == ChessGame.TeamColor.WHITE) {
                 ChessboardUI.PrintWhiteHighlight(game.getBoard(), moves);
             } else if (color == ChessGame.TeamColor.BLACK) {
                 ChessboardUI.PrintBlackHighlight(game.getBoard(), moves);
@@ -117,7 +117,7 @@ public class GameplayMenu extends Endpoint {
     }
 
     public String ObserveLoop() throws Exception {
-        String input = getString("[Observing]>>> \n");
+        String input = getString("[Observing]>>> ");
         input = input.toLowerCase();
         if (input.equals("quit")) {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, gameID);
@@ -236,16 +236,17 @@ public class GameplayMenu extends Endpoint {
         if (strmove.contains(" ")) {
             temp = strmove.split(" ");
         } else {
-            System.out.println("Input not understood (please type like so: a3 a4)\n");
+            System.out.println("Input not understood (please type like so: a3 a4)");
             return null;
         }
         ChessPosition start = getPos(temp[0]);
         ChessPosition end = getPos(temp[1]);
         if (start == null || end == null) {
-            System.out.println("Input not understood (please type like so: a3 a4)\n");
+            System.out.println("Input not understood (please type like so: a3 a4)");
             return null;
         } else if (game.getBoard().getPiece(start) == null || game.getBoard().getPiece(start).getTeamColor() != color) {
-            System.out.println("Please choose one of your pieces on the board\n");
+            System.out.println("Please choose one of your pieces on the board");
+            return null;
         }
         ChessPiece.PieceType promo = null;
 
@@ -263,7 +264,7 @@ public class GameplayMenu extends Endpoint {
                     } else if (getpromo.equals("b") || getpromo.equals("bishop")) {
                         promo = ChessPiece.PieceType.BISHOP;
                     } else {
-                        System.out.println("Input not understood (please type q/r/k/b)\n");
+                        System.out.println("Input not understood (please type q/r/k/b)");
                     }
                 }
             }

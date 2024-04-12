@@ -107,8 +107,6 @@ public class DatabaseManager {
               `authToken` varchar(256) NOT NULL,
               `gameID` int NOT NULL,
               PRIMARY KEY (`watchID`),
-              FOREIGN KEY (`gameID`) references game(gameID),
-              FOREIGN KEY (`authToken`) references auth(authToken),
               INDEX(watchID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """

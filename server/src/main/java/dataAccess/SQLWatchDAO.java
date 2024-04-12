@@ -77,7 +77,7 @@ public class SQLWatchDAO extends SQLDAO implements WatchDAO {
     }
 
     public void clear() throws DataAccessException {
-        var statement = "DELETE FROM watch";
+        var statement = "TRUNCATE watch";
         executeUpdate(statement);
     }
 

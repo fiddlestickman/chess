@@ -25,6 +25,9 @@ class Service {
     public AuthData authenticate(String authToken) throws DataAccessException, ServiceException{
         AuthDAO authDAO = SQLAuthDAO.getInstance();
         AuthData auth;
+        if (authToken.startsWith("\"")) {
+            authToken = authToken.substring(1, 21);
+        }
         auth = authDAO.readAuth(authToken);
         if (auth == null)
             throw new ServiceException("unauthorized", 401);

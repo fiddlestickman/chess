@@ -150,14 +150,17 @@ public class ChessboardUI {
 
             out.print(EMPTY.repeat(prefixLength));
             String piece;
+            ChessPosition pos;
             if (white) {
-                piece = getPiece(out, board, 8-row, boardCol+1);
+                pos = new ChessPosition(8-row, boardCol+1);
+                piece = getPiece(out, board, pos);
             } else {
-                piece = getPiece(out, board, row+1, 8-boardCol);
+                pos = new ChessPosition(row+1, 8-boardCol);
+                piece = getPiece(out, board, pos);
             }
 
             boolean highlight = false;
-            if (positions != null && positions.contains(new ChessPosition(row, boardCol)))
+            if (positions != null && positions.contains(pos))
                 highlight = true;
 
             printPlayer(out, piece, color, highlight);
@@ -187,8 +190,7 @@ public class ChessboardUI {
         setWhite(out);
     }
 
-    private static String getPiece(PrintStream out, ChessBoard board, int row, int col) {
-        ChessPosition pos = new ChessPosition(row, col);
+    private static String getPiece(PrintStream out, ChessBoard board, ChessPosition pos) {
         ChessPiece piece = board.getPiece(pos);
         String output = null;
         if (piece == null) {

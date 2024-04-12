@@ -79,7 +79,6 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         return null;
     }
     public void clear() throws DataAccessException {
-
         var statement = "DELETE FROM user";
         executeUpdate(statement);
     }
