@@ -84,24 +84,25 @@ public class WSServer {
                 return;
             }
             ServerMessage game = (ServerMessage) handler.deserialize(loadgame.getMessage(), ServerMessage.class);
+            if (game != null) {
+                ChessGame.TeamColor color;
+                String strColor;
 
-            ChessGame.TeamColor color;
-            String strColor;
+                if (game.getGame().getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                    color = ChessGame.TeamColor.BLACK;
+                    strColor = "BLACK";
+                } else {
+                    color = ChessGame.TeamColor.WHITE;
+                    strColor = "WHITE";
+                }
 
-            if (game.getGame().getTeamTurn() == ChessGame.TeamColor.WHITE) {
-                color = ChessGame.TeamColor.BLACK;
-                strColor = "BLACK";
-            } else {
-                color = ChessGame.TeamColor.WHITE;
-                strColor = "WHITE";
-            }
-
-            if (game.getGame().isInCheckmate(color)) {
-                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in checkmate!"));
-            } else if (game.getGame().isInStalemate(color)) {
-                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in stalemate!"));
-            } else if (game.getGame().isInCheck(color)) {
-                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in check!"));
+                if (game.getGame().isInCheckmate(color)) {
+                    broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in checkmate!"));
+                } else if (game.getGame().isInStalemate(color)) {
+                    broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in stalemate!"));
+                } else if (game.getGame().isInCheck(color)) {
+                    broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in check!"));
+                }
             }
 
             broadcastAll(command.getGameID(), loadgame);
