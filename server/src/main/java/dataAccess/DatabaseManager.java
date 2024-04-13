@@ -104,7 +104,7 @@ public class DatabaseManager {
             ""","""
             CREATE TABLE IF NOT EXISTS  watch (
               `watchID` int NOT NULL AUTO_INCREMENT,
-              `authToken` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
               `gameID` int NOT NULL,
               PRIMARY KEY (`watchID`),
               INDEX(watchID)

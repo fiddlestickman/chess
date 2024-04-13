@@ -1,4 +1,4 @@
 package model;
 
-public record WatchData (String auth, int gameID) {
+public record WatchData (String username, int gameID) {
 }

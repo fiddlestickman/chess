@@ -23,7 +23,7 @@ public class MemoryWatchDAO extends MemoryDAO<WatchData> implements WatchDAO {
         return super.readAll(user, "gameID");
     }
 
-    public WatchData findWatch(String auth, int gameID) {
+    public WatchData findWatch(String username, int gameID) {
         return null;
     }
 

@@ -80,7 +80,7 @@ public class WSManager extends service.Service {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
 
-        WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
+        WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
 
         if (watch == null) {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "No watcher with that authtoken found");
@@ -221,7 +221,7 @@ public class WSManager extends service.Service {
         } else if (Objects.equals(authdata.username(), game.blackUsername())) {
             gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game()));
         } else {
-            WatchData watch = watchDAO.findWatch(authdata.authToken(), gameID);
+            WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
             if (watch == null) {
                 return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "A non-player, non-observer tried to leave the game");
             }
