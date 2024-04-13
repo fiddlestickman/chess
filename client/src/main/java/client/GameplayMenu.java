@@ -107,6 +107,7 @@ public class GameplayMenu extends Endpoint {
             } if(game.getBoard().getPiece(pos) == null) {
                 System.out.print("No piece at that position.");
                 return "keep looping";
+
             }
             Collection<ChessMove> moves = game.validMoves(pos);
             if (color == ChessGame.TeamColor.WHITE) {
