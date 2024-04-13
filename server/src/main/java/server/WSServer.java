@@ -1,7 +1,9 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import service.WSManager;
@@ -80,6 +82,26 @@ public class WSServer {
             if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
                 broadcastOne(session, notification);
                 return;
+            }
+            ServerMessage game = (ServerMessage) handler.deserialize(loadgame.getMessage(), ServerMessage.class);
+
+            ChessGame.TeamColor color;
+            String strColor;
+
+            if (game.getGame().getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                color = ChessGame.TeamColor.BLACK;
+                strColor = "BLACK";
+            } else {
+                color = ChessGame.TeamColor.WHITE;
+                strColor = "WHITE";
+            }
+
+            if (game.getGame().isInCheckmate(color)) {
+                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in checkmate!"));
+            } else if (game.getGame().isInStalemate(color)) {
+                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in stalemate!"));
+            } else if (game.getGame().isInCheck(color)) {
+                broadcastAll(command.getGameID(), new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, strColor + " is in check!"));
             }
 
             broadcastAll(command.getGameID(), loadgame);
@@ -167,7 +189,7 @@ public class WSServer {
         }
     }
 
-    public String serialize (Object thing) {
+    private String serialize (Object thing) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
