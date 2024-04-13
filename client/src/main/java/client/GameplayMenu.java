@@ -104,6 +104,9 @@ public class GameplayMenu extends Endpoint {
             if (pos == null) {
                 System.out.println("Did not understand input (format like a3, c6)");
                 return "keep looping";
+            } if(game.getBoard().getPiece(pos) == null) {
+                System.out.print("No piece at that position.");
+                return "keep looping";
             }
             Collection<ChessMove> moves = game.validMoves(pos);
             if (color == ChessGame.TeamColor.WHITE) {

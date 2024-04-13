@@ -80,12 +80,12 @@ public class WSManager extends service.Service {
         if(authdata == null) {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Authtoken was wrong");
         }
-
+        /*
         WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
 
         if (watch == null) {
             return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "No watcher with that authtoken found");
-        }
+        } */
 
         StringBuilder builder = new StringBuilder();
         builder.append("Observer ");
@@ -221,12 +221,12 @@ public class WSManager extends service.Service {
             gameDAO.update(new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game()));
         } else if (Objects.equals(authdata.username(), game.blackUsername())) {
             gameDAO.update(new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game()));
-        } else {
+        } else {/*
             WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
             if (watch == null) {
                 return new ServerMessage(ServerMessage.ServerMessageType.ERROR, "A non-player, non-observer tried to leave the game");
             }
-            watchDAO.delete(watch);
+            watchDAO.delete(watch); */
             String notice = authdata.username() + "has stopped observing\n";
             return new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notice);
         }
@@ -319,7 +319,7 @@ public class WSManager extends service.Service {
         } catch (Exception e){
             throw new DataAccessException("something went wrong with authentication");
         }
-        WatchData watch = watchDAO.findWatch(authdata.username(), gameID);
+        WatchData watch = null; // instead of null, watchDAO.findWatch(authdata.username(), gameID);
         if (watch != null) {
             watchDAO.delete(watch);
         }
