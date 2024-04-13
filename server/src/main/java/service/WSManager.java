@@ -66,10 +66,7 @@ public class WSManager extends service.Service {
     }
 
     public ServerMessage joinObserverNotify(UserGameCommand command) throws DataAccessException {
-        int gameID = command.getGameID();
         String auth = command.getAuthString();
-
-        WatchDAO watchDAO = SQLWatchDAO.getInstance();
 
         AuthData authdata;
         try {
@@ -198,7 +195,6 @@ public class WSManager extends service.Service {
         int gameID = command.getGameID();
 
         GameDAO gameDAO = SQLGameDAO.getInstance();
-        WatchDAO watchDAO = SQLWatchDAO.getInstance();
 
         AuthData authdata;
         try {
@@ -301,16 +297,11 @@ public class WSManager extends service.Service {
     }
 
     public void delete(String auth, int gameID) throws DataAccessException {
-        WatchDAO watchDAO = SQLWatchDAO.getInstance();
         AuthData authdata;
         try {
             authdata = authenticate(auth);
         } catch (Exception e){
             throw new DataAccessException("something went wrong with authentication");
-        }
-        WatchData watch = null;
-        if (watch != null) {
-            watchDAO.delete(watch);
         }
     }
     public String getUsername(String auth) throws DataAccessException {

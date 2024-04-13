@@ -101,15 +101,7 @@ public class DatabaseManager {
               FOREIGN KEY (`blackUser`) references user(username),
               INDEX(gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            ""","""
-            CREATE TABLE IF NOT EXISTS  watch (
-              `watchID` int NOT NULL AUTO_INCREMENT,
-              `username` varchar(256) NOT NULL,
-              `gameID` int NOT NULL,
-              PRIMARY KEY (`watchID`),
-              INDEX(watchID)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
+            """,
     };
 
     public void configureDatabase() throws DataAccessException {

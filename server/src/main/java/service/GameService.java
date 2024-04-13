@@ -38,11 +38,6 @@ public class GameService extends Service {
             GameData newgame = new GameData(game.gameID(), game.whiteUsername(), auth.username(), game.gameName(), game.game());
             gameDAO.update(newgame);
         }
-        else {
-            WatchData newwatch = new WatchData(auth.username(), game.gameID());
-            WatchDAO watchDAO = SQLWatchDAO.getInstance();
-            watchDAO.create(newwatch);
-        }
     }
     public Collection<GameData> listGames(String authToken) throws DataAccessException , ServiceException {
         GameDAO gameDAO = SQLGameDAO.getInstance();
