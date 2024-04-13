@@ -30,11 +30,10 @@ public class WSServer {
 
         UserGameCommand command = (UserGameCommand) handler.deserialize(message, UserGameCommand.class);
         if (command.getCommandType() == UserGameCommand.CommandType.JOIN_PLAYER) {
-            String auth = command.getAuthString();
-            if (auth.startsWith("\"")) {
-                auth = auth.substring(1, 21);
+            String username = manager.getUsername(command.getAuthString());
+            if (username != null) {
+                add(username, command.getGameID(), session);
             }
-            add(auth, session);
             ServerMessage notification = manager.joinPlayerNotify(command);
             if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
                 broadcastOne(session, notification);
@@ -51,11 +50,11 @@ public class WSServer {
             broadcastAllOthers(command.getGameID(), session, notification);
 
         } else if (command.getCommandType() == UserGameCommand.CommandType.JOIN_OBSERVER) {
-            String auth = command.getAuthString();
-            if (auth.startsWith("\"")) {
-                auth = auth.substring(1, 21);
+            String username = manager.getUsername(command.getAuthString());
+            if (username != null) {
+                add(username, command.getGameID(), session);
             }
-            add(auth, session);
+
             ServerMessage notification = manager.joinObserverNotify(command);
 
             if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
@@ -96,7 +95,7 @@ public class WSServer {
 
             broadcastAllOthers(command.getGameID(), session, notification);
             session.close();
-            connections.remove(command.getAuthString());
+            connections.remove(manager.getUsername(command.getAuthString()));
         } else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             ServerMessage loadgame = manager.resign(command);
             if (loadgame.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
@@ -115,13 +114,13 @@ public class WSServer {
         }
     }
 
-    public void add(String auth, Session session) {
-        Connection connection = new Connection(auth, session);
+    public void add(String auth, int gameID, Session session) {
+        Connection connection = new Connection(auth, gameID, session);
         connections.put(auth, connection);
     }
 
-    public void remove(String auth) {
-        connections.remove(auth);
+    public void remove(String username) {
+        connections.remove(username);
     }
 
     public void broadcastAll(int gameID, ServerMessage message) {
@@ -129,9 +128,9 @@ public class WSServer {
         WSManager manager = new WSManager();
         connections.forEach(12, (k, v) -> {
             try {
-                if (v.getSession().isOpen()) {
+                if (v.getSession().isOpen() && gameID == v.getGameID()) {
                     v.getSession().getRemote().sendString(serialize(message));
-                } else {
+                } else if (gameID == v.getGameID()){
                     manager.delete(k, gameID);
                 }
             } catch (Exception e) {
@@ -144,9 +143,9 @@ public class WSServer {
         WSManager manager = new WSManager();
         connections.forEach(12, (k, v) -> {
             try {
-                if (v.getSession().isOpen() && v.getSession() != session) {
+                if (v.getSession().isOpen() && v.getSession() != session && gameID == v.getGameID()) {
                     v.getSession().getRemote().sendString(serialize(message));
-                } else if (v.getSession() == session) {}
+                } else if (v.getSession() == session && gameID == v.getGameID()) {}
                 else {
                     manager.delete(k, gameID);
                 }
@@ -176,16 +175,19 @@ public class WSServer {
     }
 
     public class Connection {
-        private String auth;
+        private String username;
+        private int gameID;
         private Session session;
 
-        Connection(String auth, Session session) {
-            this.auth = auth;
+        Connection(String username, int gameID, Session session) {
+            this.username = username;
+            this.gameID = gameID;
             this.session = session;
         }
-        String getAuth() {
-            return auth;
+        String getUsername() {
+            return username;
         }
+        int getGameID() {return gameID; }
         Session getSession() {
             return session;
         }

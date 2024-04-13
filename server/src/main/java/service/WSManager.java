@@ -7,6 +7,7 @@ import model.*;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
+import javax.xml.crypto.Data;
 import java.util.Objects;
 
 public class WSManager extends service.Service {
@@ -322,5 +323,14 @@ public class WSManager extends service.Service {
         if (watch != null) {
             watchDAO.delete(watch);
         }
+    }
+    public String getUsername(String auth) throws DataAccessException {
+        try {
+            AuthData data = authenticate(auth);
+            return data.username();
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }
