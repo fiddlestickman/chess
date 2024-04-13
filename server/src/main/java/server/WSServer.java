@@ -3,7 +3,6 @@ package server;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import service.WSManager;
@@ -15,15 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
 public class WSServer {
     private ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
-
-    @OnWebSocketConnect
-    public void onConnect(Session session) {
-    }
-
-    @OnWebSocketClose
-    public void onClose(Session session, int statusCode, String reason) throws Exception {
-        //close the connection after doing things
-    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
@@ -133,7 +123,6 @@ public class WSServer {
             }
 
             broadcastAll(command.getGameID(), notification);
-            //broadcastAll(command.getGameID(), loadgame);
         }
     }
 
